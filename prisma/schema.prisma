@@ -1,0 +1,114 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String?  // Optionnel pour connexion via Google/Facebook
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  favorites Favorite[]
+  searches  SearchHistory[]
+
+  @@map("users")
+}
+
+model Restaurant {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  address     String
+  latitude    Float?
+  longitude   Float?
+  phone       String?
+  website     String?
+  
+  // Horaires d'ouverture (JSON ou champs séparés)
+  openingHours Json? // Ex: {"monday": "08:00-22:00", "tuesday": "08:00-22:00", ...}
+  
+  // Images
+  images      String[] // URLs des images
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // Relations
+  dishes     RestaurantDish[]
+  favorites  Favorite[]
+  @@map("restaurants")
+}
+
+model Dish {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  category    String? // Ex: "Plat principal", "Entrée", "Dessert"
+  
+  // Pour la recherche
+  searchTerms String[] // Termes de recherche alternatifs
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  restaurants RestaurantDish[]
+
+  @@map("dishes")
+}
+
+model RestaurantDish {
+  id           String @id @default(cuid())
+  restaurantId String
+  dishId       String
+  
+  // Informations spécifiques au restaurant
+  price        Float?
+  currency     String @default("XOF") // Franc CFA
+  description  String? // Description spécifique au restaurant
+  isAvailable  Boolean @default(true)
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  dish         Dish       @relation(fields: [dishId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, dishId])
+  @@map("restaurant_dishes")
+}
+
+model Favorite {
+  id           String @id @default(cuid())
+  userId       String
+  restaurantId String
+  createdAt    DateTime @default(now())
+
+  // Relations
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, restaurantId])
+  @@map("favorites")
+}
+
+model SearchHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  query     String
+  results   Json?    // Optionnel: stocker les résultats pour analytics
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("search_history")
+}
