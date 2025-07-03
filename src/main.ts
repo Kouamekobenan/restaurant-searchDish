@@ -32,6 +32,7 @@ async function bootstrap() {
               "'self'",
               'http://localhost:3000',
               'http://localhost:5173',
+              'https://restaurant-searchdish.onrender.com',
             ],
           },
         },
@@ -42,7 +43,11 @@ async function bootstrap() {
   // CORS configuration
   const allowedOrigins = configService.get<string>('FRONTEND_URL')
     ? [configService.get<string>('FRONTEND_URL')]
-    : ['http://localhost:3000', 'http://localhost:5173'];
+    : [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'https://restaurant-searchdish.onrender.com',
+      ];
 
   app.enableCors({
     origin: allowedOrigins,
@@ -63,7 +68,7 @@ async function bootstrap() {
       basicAuth({
         users: {
           [configService.get('SWAGGER_USER') || 'admin']:
-            configService.get('SWAGGER_PASSWORD') || 'admin12',
+          configService.get('SWAGGER_PASSWORD') || 'admin12',
         },
         challenge: true,
       }),
@@ -87,6 +92,19 @@ async function bootstrap() {
       'access-token',
     )
     .build();
+  // Ajoute juste après app = await NestFactory.create(...)
+  // app.set('trust proxy', 1);
+  app.setGlobalPrefix('api'); // optionnel
+
+  // Ajoute tout en bas avant bootstrap()
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  });
+
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception thrown:', err);
+    process.exit(1);
+  });
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
