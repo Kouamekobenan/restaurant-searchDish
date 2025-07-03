@@ -15,7 +15,6 @@ async function bootstrap() {
         ? ['error', 'warn']
         : ['log', 'error', 'warn', 'debug', 'verbose'],
   });
-
   // ✅ Helmet avec contentSecurityPolicy correct
   app.use(
     helmet({
@@ -32,9 +31,7 @@ async function bootstrap() {
       },
     }),
   );
-
   const configService = app.get(ConfigService);
-
   const port = process.env.PORT
     ? parseInt(process.env.PORT, 10)
     : configService.get<number>('PORT', 3000);
@@ -43,7 +40,11 @@ async function bootstrap() {
 
   // ✅ Configuration CORS pour le frontend Electron/Next.js
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:5173'],
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'https://restaurant-searchdish.onrender.com',
+    ],
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Authorization', 'Content-Type'],
     credentials: true,
@@ -87,5 +88,4 @@ async function bootstrap() {
     process.exit(1);
   }
 }
-
 bootstrap();
