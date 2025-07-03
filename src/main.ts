@@ -8,9 +8,10 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/role.guard';
 import helmet from 'helmet';
 import * as basicAuth from 'express-basic-auth';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger:
       process.env.NODE_ENV === 'production'
         ? ['error', 'warn']
@@ -19,7 +20,7 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  // Configuration Helmet plus permissive temporairement
+  // 🔐 Helmet + CSP
   app.use(
     helmet({
       contentSecurityPolicy: {
@@ -30,46 +31,39 @@ async function bootstrap() {
             'http://localhost:3000',
             'http://localhost:5173',
             'https://restaurant-searchdish.onrender.com',
-            'https://*.onrender.com', // Temporaire
-            'https://*.vercel.app', // Si vous utilisez Vercel
-            'https://*.netlify.app', // Si vous utilisez Netlify
+            'https://*.onrender.com',
+            'https://*.vercel.app',
+            'https://*.netlify.app',
           ],
         },
       },
     }),
   );
 
-  // CORS plus permissif temporairement
+  // ✅ CORS configuration propre
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'https://restaurant-searchdish.onrender.com',
+    'https://restaurant-searchdish.vercel.app', // si applicable
+  ];
+
   app.enableCors({
     origin: (origin, callback) => {
       console.log('Tentative de connexion depuis:', origin);
 
-      // Autorise les requêtes sans origine (Postman, applications mobiles)
       if (!origin) return callback(null, true);
 
-      // Liste des origines autorisées
-      const allowedOrigins = [
-        'http://localhost:3000',
-        'http://localhost:5173',
-        'https://restaurant-searchdish.onrender.com',
-        // Ajoutez ici l'URL de votre frontend
-      ];
-
-      // Temporairement, autorise tout en développement
-      if (process.env.NODE_ENV !== 'production') {
+      if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        console.error('Bloqué par CORS:', origin);
-        callback(new Error('Not allowed by CORS'));
-      }
+      console.warn('🚫 Origine bloquée par CORS :', origin);
+      return callback(new Error('Not allowed by CORS'));
     },
+    credentials: true,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Authorization', 'Content-Type'],
-    credentials: true,
   });
 
   // Filtres et guards globaux
@@ -77,7 +71,7 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
 
-  // Authentification Swagger en production
+  // 🔐 Swagger Basic Auth en production
   if (process.env.NODE_ENV === 'production') {
     app.use(
       ['/api/docs', '/api/docs-json'],
@@ -109,11 +103,16 @@ async function bootstrap() {
     )
     .build();
 
-  // Ajoute juste après app = await NestFactory.create(...)
-  // app.set('trust proxy', 1);
-  app.setGlobalPrefix('api'); // optionnel
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
 
-  // Gestion des erreurs non capturées
+  // 🔧 Optionnel : préfixe global
+  app.setGlobalPrefix('api');
+
+  // 🔒 Trust proxy si hébergé sur Render
+  app.set('trust proxy', 1);
+
+  // Gestion des erreurs process
   process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   });
@@ -123,28 +122,22 @@ async function bootstrap() {
     process.exit(1);
   });
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
-
-  const port = process.env.PORT
-    ? parseInt(process.env.PORT, 10)
-    : configService.get<number>('PORT', 3000);
-
+  const port =
+    parseInt(process.env.PORT || '3000', 10) ||
+    configService.get<number>('PORT', 3000);
   const host = configService.get<string>('HOST', '0.0.0.0');
 
   try {
     await app.listen(port, host);
 
     const logger = new Logger('Bootstrap');
-    logger.log(
-      `🔑 Code swagger en production : ${process.env.SWAGGER_PASSWORD}`,
-    );
-    logger.log(`🚀 Application running on: ${await app.getUrl()}/api/docs`);
+    logger.log(`🔑 Code swagger : ${process.env.SWAGGER_PASSWORD}`);
+    logger.log(`🚀 App running on: ${await app.getUrl()}/api/docs`);
     logger.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
     logger.log(`📡 Listening on ${host}:${port}`);
   } catch (error) {
     const logger = new Logger('Bootstrap');
-    logger.error('❌ Failed to start the server', error);
+    logger.error('❌ Server start failed', error);
     process.exit(1);
   }
 }
