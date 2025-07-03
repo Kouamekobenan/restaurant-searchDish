@@ -19,38 +19,54 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  // Helmet configuration
-  if (process.env.NODE_ENV === 'production') {
-    app.use(helmet());
-  } else {
-    app.use(
-      helmet({
-        contentSecurityPolicy: {
-          directives: {
-            defaultSrc: ["'self'"],
-            connectSrc: [
-              "'self'",
-              'http://localhost:3000',
-              'http://localhost:5173',
-              'https://restaurant-searchdish.onrender.com',
-            ],
-          },
+  // Configuration Helmet plus permissive temporairement
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          connectSrc: [
+            "'self'",
+            'http://localhost:3000',
+            'http://localhost:5173',
+            'https://restaurant-searchdish.onrender.com',
+            'https://*.onrender.com', // Temporaire
+            'https://*.vercel.app', // Si vous utilisez Vercel
+            'https://*.netlify.app', // Si vous utilisez Netlify
+          ],
         },
-      }),
-    );
-  }
+      },
+    }),
+  );
 
-  // CORS configuration
-  const allowedOrigins = configService.get<string>('FRONTEND_URL')
-    ? [configService.get<string>('FRONTEND_URL')]
-    : [
+  // CORS plus permissif temporairement
+  app.enableCors({
+    origin: (origin, callback) => {
+      console.log('Tentative de connexion depuis:', origin);
+
+      // Autorise les requêtes sans origine (Postman, applications mobiles)
+      if (!origin) return callback(null, true);
+
+      // Liste des origines autorisées
+      const allowedOrigins = [
         'http://localhost:3000',
         'http://localhost:5173',
         'https://restaurant-searchdish.onrender.com',
+        // Ajoutez ici l'URL de votre frontend
       ];
 
-  app.enableCors({
-    origin: allowedOrigins,
+      // Temporairement, autorise tout en développement
+      if (process.env.NODE_ENV !== 'production') {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        console.error('Bloqué par CORS:', origin);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Authorization', 'Content-Type'],
     credentials: true,
@@ -68,7 +84,7 @@ async function bootstrap() {
       basicAuth({
         users: {
           [configService.get('SWAGGER_USER') || 'admin']:
-          configService.get('SWAGGER_PASSWORD') || 'admin12',
+            configService.get('SWAGGER_PASSWORD') || 'admin12',
         },
         challenge: true,
       }),
@@ -92,11 +108,12 @@ async function bootstrap() {
       'access-token',
     )
     .build();
+
   // Ajoute juste après app = await NestFactory.create(...)
   // app.set('trust proxy', 1);
   app.setGlobalPrefix('api'); // optionnel
 
-  // Ajoute tout en bas avant bootstrap()
+  // Gestion des erreurs non capturées
   process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   });
@@ -120,7 +137,7 @@ async function bootstrap() {
 
     const logger = new Logger('Bootstrap');
     logger.log(
-      `🔑 Code swagger an production :${process.env.SWAGGER_PASSWORD}`,
+      `🔑 Code swagger en production : ${process.env.SWAGGER_PASSWORD}`,
     );
     logger.log(`🚀 Application running on: ${await app.getUrl()}/api/docs`);
     logger.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
