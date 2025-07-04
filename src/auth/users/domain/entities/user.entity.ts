@@ -6,7 +6,6 @@ export class User {
     private email: string,
     private password: string | null,
     private name: string | null,
-    // private role: UserRole,
     private createdAt: Date,
     private updatedAt: Date,
   ) {}

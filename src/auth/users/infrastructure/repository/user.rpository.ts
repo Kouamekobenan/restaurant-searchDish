@@ -56,7 +56,11 @@ export class UserRepository implements IUserRepository {
       const allUsers = await this.prisma.user.findMany();
       return allUsers.map((user) => this.mapper.toAplication(user));
     } catch (error) {
-      throw new BadGatewayException("une erreur s'est produite:", error);
+      console.error('Erreur dans getAllUsers:', error);
+      throw new BadGatewayException({
+        message: "une erreur s'est produite",
+        cause: error.message || error,
+      });
     }
   }
 
@@ -161,7 +165,7 @@ export class UserRepository implements IUserRepository {
         limit,
       };
     } catch (error) {
-      this.logger.error('Failed to filter users')
+      this.logger.error('Failed to filter users');
       throw new BadRequestException('Failed to filter user ', {
         cause: error,
         description: error.message,
