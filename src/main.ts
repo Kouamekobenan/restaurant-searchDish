@@ -53,8 +53,8 @@ async function bootstrap() {
   // ✅ Filtres et guards globaux
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  const reflector = app.get(Reflector);
-  app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
+  // const reflector = app.get(Reflector);
+  // app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
 
   // ✅ Swagger config
   const config = new DocumentBuilder()
