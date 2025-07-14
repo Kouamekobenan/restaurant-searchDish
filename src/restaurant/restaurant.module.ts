@@ -10,6 +10,9 @@ import { UpdateRestaurantUseCase } from './application/usecases/update-restauran
 import { PaginationRestaurantUseCase } from './application/usecases/pagination-restaurant.usecase';
 import { GetAllRestaurantUseCase } from './application/usecases/getAll-restaurant.usecase';
 import { DeleteRestaurantUseCase } from './application/usecases/delete-restaurant.usecase';
+import { FindRestaurantByIdUseCase } from './application/usecases/find-restaurant-byId.usecase';
+import { DeactivateRestaurantUseCase } from './application/usecases/deactivate-restaurant.usecase';
+import { ActivateRestaurantUseCase } from './application/usecases/activate-restaurant.usecase';
 
 @Module({
   imports: [],
@@ -25,6 +28,9 @@ import { DeleteRestaurantUseCase } from './application/usecases/delete-restauran
     PaginationRestaurantUseCase,
     GetAllRestaurantUseCase,
     DeleteRestaurantUseCase,
+    FindRestaurantByIdUseCase,
+    DeactivateRestaurantUseCase,
+    ActivateRestaurantUseCase,
     {
       provide: RestaurantRepositoryName,
       useClass: RestaurantRepository,

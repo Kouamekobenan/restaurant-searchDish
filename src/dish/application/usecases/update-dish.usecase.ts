@@ -17,9 +17,19 @@ export class UpdateDishUseCase {
     @Inject(DishRepositoryName)
     private readonly dishRepository: IDishRepository,
   ) {}
-  async execute(id: string, updateDto: UpdateDishDto): Promise<Dish> {
+  async execute(
+    id: string,
+    updateDto: UpdateDishDto,
+    imagePath?: string,
+  ): Promise<Dish> {
     try {
-      return await this.dishRepository.update(id, updateDto);
+      return await this.dishRepository.update(id, {
+        name:updateDto?.name,
+        description:updateDto?.description,
+        category:updateDto?.category,
+        image:imagePath
+        
+      });
     } catch (error) {
       this.logger.error('Failled to  update dish', error.stack);
       throw new BadRequestException('Failled to update dish', {

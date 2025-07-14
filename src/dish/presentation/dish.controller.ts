@@ -1,15 +1,67 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { CreateDishUseCase } from '../application/usecases/create-dish.usecase';
 import { DishDto } from '../application/dtos/create-dish.dto';
 import { Dish } from '../domain/entities/dish.entity';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiQuery,
+  ApiParam,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { FindallDishUseCase } from '../application/usecases/findAll-dish.usecase';
 import { PaginationDishUseCase } from '../application/usecases/pagination-dish.usecase';
 import { PaginateDto } from '../application/dtos/pagination-dish.dto';
 import { UpdateDishUseCase } from '../application/usecases/update-dish.usecase';
 import { UpdateDishDto } from '../application/dtos/update-dish.dto';
 import { DeleteDishUseCase } from '../application/usecases/delete-dish.usecase';
-import {  GetDishByIdUseCase } from '../application/usecases/get-dish-byId.usecase';
+import { GetDishByIdUseCase } from '../application/usecases/get-dish-byId.usecase';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { extname, join } from 'path';
+import { diskStorage } from 'multer';
+
+// ✅ Multer config avec validation
+const multerOptions = {
+  storage: diskStorage({
+    destination: join(__dirname, '../../../uploads/dish'),
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, uniqueSuffix + extname(file.originalname));
+    },
+  }),
+  limits: {
+    fileSize: 2 * 1024 * 1024, // Max 2 Mo
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /\/(jpg|jpeg|png)$/;
+    if (!file.mimetype.match(allowedTypes)) {
+      return cb(
+        new BadRequestException(
+          '❌ Seules les images JPG, JPEG, PNG sont autorisées.',
+        ),
+        false,
+      );
+    }
+    cb(null, true);
+  },
+};
+
 @ApiTags('Dish') // Groupe Swagger
 @Controller('Dish')
 export class DishController {
@@ -23,17 +75,30 @@ export class DishController {
   ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Créer un nouveau plat' })
-  @ApiBody({ type: DishDto })
+  @UseInterceptors(FileInterceptor('image', multerOptions))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: DishDto }) // Swagger doc
+  @ApiOperation({ summary: 'Créer un nouveau plat avec image' })
   @ApiResponse({
     status: 201,
     description: 'Le plat a été créé avec succès.',
     type: Dish,
   })
-  @ApiResponse({ status: 400, description: 'Données invalides fournies.' })
-  async create(@Body() createDto: DishDto): Promise<Dish> {
-    return await this.createDishUseCase.execute(createDto);
+  @ApiResponse({
+    status: 400,
+    description: 'Données invalides ou fichier manquant.',
+  })
+  async create(
+    @Body() createDto: DishDto,
+    @UploadedFile() image: Express.Multer.File, 
+  ): Promise<Dish> {
+    const imagePath: string | undefined = image
+      ? `/uploads/dish/${image.filename}`
+      : undefined;
+
+    return await this.createDishUseCase.execute(createDto, imagePath);
   }
+
   @Get('paginate')
   @ApiOperation({ summary: 'Paginer les plats' })
   @ApiQuery({
@@ -87,6 +152,7 @@ export class DishController {
     return await this.findallDishUseCase.execute();
   }
   @Patch(':id')
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Modifier un plat existant' })
   @ApiParam({
     name: 'id',
@@ -111,11 +177,14 @@ export class DishController {
     status: 400,
     description: 'Requête invalide',
   })
+  @UseInterceptors(FileInterceptor('image', multerOptions))
   async update(
     @Param('id') id: string,
     @Body() updateDto: UpdateDishDto,
+    @UploadedFile() image?: Express.Multer.File,
   ): Promise<Dish> {
-    return await this.updateDishUseCase.execute(id, updateDto);
+    const imagePath = image ? `/uploads/dish/${image.filename}` : undefined;
+    return await this.updateDishUseCase.execute(id, updateDto, imagePath);
   }
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer un plat par ID' })

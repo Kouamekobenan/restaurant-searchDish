@@ -64,14 +64,14 @@ export class UpdateRestaurantDto {
   @IsUrl()
   @IsOptional()
   website?: string;
-
   @ApiProperty({
-    example:['https://images.com/resto.jpg'] ,
-    description: "URL de l'image du restaurant",
+    type: 'string',
+    format: 'binary',
+    required: false,
+    description: 'Image principale du restaurant (upload)',
   })
-  @IsUrl()
   @IsOptional()
-  image?: string[];
+  image?: any;
 
   @ApiProperty({
     example: true,
@@ -80,19 +80,19 @@ export class UpdateRestaurantDto {
   @IsBoolean()
   isActive: boolean;
 
-   @ApiProperty({
-      example: {
-        monday: '08:00-20:00',
-        tuesday: '08:00-20:00',
-        wednesday: '08:00-20:00',
-        thursday: '08:00-20:00',
-        friday: '08:00-22:00',
-        saturday: '10:00-22:00',
-        sunday: 'Fermé',
-      },
-      description: "Horaires d'ouverture du restaurant sous forme de JSON",
-      type: Object,
-    })
-    @IsObject()
-    openingHours: Record<string, string>;
+  @ApiProperty({
+    example: {
+      monday: '08:00-20:00',
+      tuesday: '08:00-20:00',
+      wednesday: '08:00-20:00',
+      thursday: '08:00-20:00',
+      friday: '08:00-22:00',
+      saturday: '10:00-22:00',
+      sunday: 'Fermé',
+    },
+    description: "Horaires d'ouverture du restaurant sous forme de JSON",
+    type: Object,
+  })
+  @IsObject()
+  openingHours: Record<string, string>;
 }

@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { IRestaurantRepository } from '../domain/interfaces/restaurant.interface';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RestaurantMapper } from '../domain/mappers/restaurant-mapper.mapper';
@@ -106,6 +111,58 @@ export class RestaurantRepository implements IRestaurantRepository {
       await this.prisma.restaurant.delete({ where: { id } });
     } catch (error) {
       throw new BadRequestException('Failled to delete restaurant by ID ', {
+        cause: error,
+        description: error.message,
+      });
+    }
+  }
+  async findById(id: string): Promise<Restaurant> {
+    try {
+      const restaurant = await this.prisma.restaurant.findUnique({
+        where: { id },
+      });
+      if (!restaurant) {
+        throw new NotFoundException(`Restaurant with ID:${id} not found`);
+      }
+      return this.mapper.toEntiy(restaurant);
+    } catch (error) {
+      this.logger.error(
+        `Failled to retrieve restaurant (ID:${id}) error-${error.message}`,
+      );
+      throw new BadRequestException(`Failled to retrieve resteurant`, {
+        cause: error,
+        description: error.message,
+      });
+    }
+  }
+  async deactive(id: string): Promise<void> {
+    try {
+      await this.prisma.restaurant.update({
+        where: { id },
+        data: { isActive: false },
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failled to deactivate restaurant with ID: ${id} error-${error.message}`,
+      );
+      throw new BadRequestException('Failled to deactivate restaurant', {
+        cause: error,
+        description: error.message,
+      });
+    }
+  }
+
+  async active(id: string): Promise<void> {
+    try {
+      await this.prisma.restaurant.update({
+        where: { id },
+        data: { isActive: true },
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failled to activate restaurant with ID: ${id} error-${error.message}`,
+      );
+      throw new BadRequestException('Failled to activate restaurant', {
         cause: error,
         description: error.message,
       });

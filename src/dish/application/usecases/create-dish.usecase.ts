@@ -17,9 +17,14 @@ export class CreateDishUseCase {
     @Inject(DishRepositoryName)
     private readonly dishRepositorty: IDishRepository,
   ) {}
-  async execute(createDto: DishDto): Promise<Dish> {
+  async execute(createDto: DishDto, pathImage?: string): Promise<Dish> {
     try {
-      const dishs = await this.dishRepositorty.create(createDto);
+      const dishs = await this.dishRepositorty.create({
+        name: createDto.name,
+        description: createDto.description,
+        category: createDto.category,
+        image: pathImage,
+      });
       return dishs;
     } catch (error) {
       this.logger.error('Failled to create dish', error.stack);

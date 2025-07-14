@@ -24,4 +24,12 @@ export class UpdateDishDto {
   @IsString()
   @IsOptional()
   category: string;
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'Image du plat (fichier à uploader)',
+    required: false,
+  })
+  @IsOptional()
+  image?: any; 
 }

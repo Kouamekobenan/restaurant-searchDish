@@ -26,4 +26,13 @@ export class UserDto {
   @IsString()
   name?: string;
 
+  @ApiProperty({
+    example: UserRole.RESTAURATEUR,
+    enum: UserRole,
+    description: "Rôle de l'utilisateur (RESTAURATEUR, ADMIN, DELIVERY)",
+    default: UserRole.RESTAURATEUR,
+  })
+  @IsEnum(UserRole)
+  @IsOptional() // facultatif si tu veux que le backend attribue un rôle par défaut
+  role?: UserRole;
 }

@@ -17,9 +17,9 @@ export class CreateRestaurantUseCase {
     @Inject(RestaurantRepositoryName)
     private readonly restaurantRepository: IRestaurantRepository,
   ) {}
-  async execute(createDto: RestaurantDto): Promise<Restaurant> {
+  async execute(createDto: RestaurantDto, imagePath?:string): Promise<Restaurant> {
     try {
-      const restaurant = await this.restaurantRepository.create(createDto);
+      const restaurant = await this.restaurantRepository.create({...createDto, image:imagePath});
       return restaurant;
     } catch (error) {
       this.logger.error('Failled to create restaurant', error.stack);

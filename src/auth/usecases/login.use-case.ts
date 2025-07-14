@@ -31,6 +31,7 @@ export class LoginUserUseCase {
     const generateToken = await this.authservice.generateToken({
       userId: isUser.getId(),
       email: isUser.getEmail(),
+      role:isUser.getRole()
     });
 
     return { user: isUser, token: generateToken };

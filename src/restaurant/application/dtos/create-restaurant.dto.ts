@@ -66,12 +66,13 @@ export class RestaurantDto {
   website?: string;
 
   @ApiProperty({
-    example: ['https://images.com/resto1.jpg', 'https://images.com/resto2.jpg'],
-    description: "Liste des URL d'images du restaurant",
-    type: [String],
+    type: 'string',
+    format: 'binary',
+    required: false,
+    description: 'Image principale du restaurant (upload)',
   })
   @IsOptional()
-  image?: string[];
+  image?: any; // pour l'upload via Multer
 
   @ApiProperty({
     example: true,

@@ -4,6 +4,7 @@ export class Dish {
     private name: string,
     private description: string | null,
     private category: string | null,
+    private image:string | null,
     private createdAt: Date,
     private updatedAt: Date,
   ) {}
@@ -20,4 +21,8 @@ export class Dish {
   getName(): string {
     return this.name;
   }
+  getImage():string | null{
+    return this.image
+  }
+  
 }

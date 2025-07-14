@@ -21,12 +21,13 @@ export class UpdateRestaurantUseCase {
   async execute(
     id: string,
     updateDto: UpdateRestaurantDto,
+    imagePath?: string,
   ): Promise<Restaurant> {
     try {
-      const restaurantData = await this.restaurantRepository.update(
-        id,
-        updateDto,
-      );
+      const restaurantData = await this.restaurantRepository.update(id, {
+        ...updateDto,
+        image: imagePath,
+      });
       this.logger.log(
         `This is data update restaurant:${JSON.stringify(restaurantData)}`,
       );

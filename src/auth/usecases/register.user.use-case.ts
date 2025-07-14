@@ -36,9 +36,10 @@ export class RegisterUserUseCase {
     const token = await this.authservice.generateToken({
       userId: newUser.getId(),
       email: newUser.getEmail(),
+      role:newUser.getRole()
     });
     return {
-      message: 'User create succeffuly',
+      message: 'User create succeffuly 🎉',
       token: token,
     };
   }

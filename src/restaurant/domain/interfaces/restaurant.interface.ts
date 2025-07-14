@@ -18,4 +18,7 @@ export interface IRestaurantRepository {
   }>;
   getAll(): Promise<Restaurant[]>;
   restauDelete(id: string): Promise<void>;
+  findById(id: string): Promise<Restaurant>;
+  deactive(id: string): Promise<void>;
+  active(id: string): Promise<void>;
 }

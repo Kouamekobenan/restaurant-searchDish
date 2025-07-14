@@ -55,6 +55,9 @@ async function bootstrap() {
 
   // const reflector = app.get(Reflector);
   // app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
+  console.log('=== DATABASE DEBUG ===');
+  console.log('DATABASE_URL:', process.env.DATABASE_URL);
+  console.log('Connecting to database...');
 
   // ✅ Swagger config
   const config = new DocumentBuilder()

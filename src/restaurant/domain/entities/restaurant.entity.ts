@@ -9,7 +9,7 @@ export class Restaurant {
     private phone: string | null,
     private website: string | null,
     private openingHours: {}, // à adapter si tu as une structure spécifique
-    private image: string[],
+    private image: string | null,
     private isActive: boolean,
     private readonly createdAt: Date,
     private updatedAt: Date,
@@ -50,7 +50,7 @@ export class Restaurant {
 
 
 
-  getImages(): string[] {
+  getImages(): string | null {
     return this.image;
   }
 
@@ -97,7 +97,7 @@ export class Restaurant {
 
   
 
-  setImages(images: string[]): void {
+  setImages(images: string): void {
     this.image = images;
   }
 

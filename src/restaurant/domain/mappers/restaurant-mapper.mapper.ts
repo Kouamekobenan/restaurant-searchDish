@@ -14,7 +14,7 @@ export class RestaurantMapper {
       modelPrisma.phone,
       modelPrisma.website,
       modelPrisma.openingHours ?? {},
-      modelPrisma.images,
+      modelPrisma.image,
       modelPrisma.isActive,
       modelPrisma.createdAt,
       modelPrisma.updatedAt,
@@ -25,12 +25,12 @@ export class RestaurantMapper {
       name: createDto.name,
       description: createDto.description,
       address: createDto.address,
-      latitude: createDto.latitude,
-      longitude: createDto.longitude,
+      latitude: Number(createDto.latitude),
+      longitude: Number(createDto.longitude),
       phone: createDto.phone,
       website: createDto.website,
       openingHours: createDto.openingHours,
-      images: createDto.image,
+      image: createDto.image,
     };
   }
   update(updateDto: UpdateRestaurantDto): Prisma.RestaurantUpdateInput {
@@ -45,10 +45,10 @@ export class RestaurantMapper {
       dataUpdate.address = updateDto.address;
     }
     if (updateDto.latitude !== undefined) {
-      dataUpdate.latitude = updateDto.latitude;
+      dataUpdate.latitude = Number(updateDto.latitude);
     }
     if (updateDto.longitude !== undefined) {
-      dataUpdate.longitude = updateDto.longitude;
+      dataUpdate.longitude = Number(updateDto.longitude);
     }
     if (updateDto.phone !== undefined) {
       dataUpdate.phone = updateDto.phone;
@@ -60,7 +60,7 @@ export class RestaurantMapper {
       dataUpdate.openingHours = updateDto.openingHours;
     }
     if (updateDto.image !== undefined) {
-      dataUpdate.images = updateDto.image;
+      dataUpdate.image = updateDto.image;
     }
     return dataUpdate;
   }

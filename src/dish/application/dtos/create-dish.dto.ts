@@ -25,4 +25,13 @@ export class DishDto {
   @IsString()
   @IsOptional()
   category: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'Image du plat (fichier à uploader)',
+    required: false,
+  })
+  @IsOptional()
+  image?: any; // pas `string`, car c’est un fichier (géré par Multer)
 }

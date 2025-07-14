@@ -2,7 +2,6 @@ import { DishDto } from 'src/dish/application/dtos/create-dish.dto';
 import { Dish } from '../entities/dish.entity';
 import { Prisma, Dish as PrismaEntity } from '@prisma/client';
 import { UpdateDishDto } from 'src/dish/application/dtos/update-dish.dto';
-
 export class DishMapper {
   toEntity(prismaModel: PrismaEntity): Dish {
     return new Dish(
@@ -10,29 +9,33 @@ export class DishMapper {
       prismaModel.name,
       prismaModel.description,
       prismaModel.category,
+      prismaModel.image,
       prismaModel.createdAt,
       prismaModel.updatedAt,
     );
   }
-
   toPersistence(createDto: DishDto): Prisma.DishCreateInput {
     return {
       name: createDto.name,
       description: createDto.description,
       category: createDto.category,
+      image: createDto.image,
     };
   }
-  update(updateDto :UpdateDishDto):Prisma.DishUpdateInput{
-    const dataDish: Prisma.DishUpdateInput={};
+  update(updateDto: UpdateDishDto): Prisma.DishUpdateInput {
+    const dataDish: Prisma.DishUpdateInput = {};
     if (updateDto.name !== undefined) {
-        dataDish.name =updateDto.name
+      dataDish.name = updateDto.name;
     }
     if (updateDto.description !== undefined) {
-        dataDish.description = updateDto.description
+      dataDish.description = updateDto.description;
     }
-    if (updateDto.category !==undefined) {
-        dataDish.category = updateDto.category
+    if (updateDto.category !== undefined) {
+      dataDish.category = updateDto.category;
     }
-    return dataDish
+    if (updateDto.image !== undefined) {
+      dataDish.image = updateDto.image;
+    }
+    return dataDish;
   }
 }
