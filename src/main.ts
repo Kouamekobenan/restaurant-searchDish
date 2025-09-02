@@ -7,13 +7,19 @@ import { Logger } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
 import { RolesGuard } from './auth/guards/role.guard';
 import helmet from 'helmet';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger:
       process.env.NODE_ENV === 'production'
         ? ['error', 'warn']
         : ['log', 'error', 'warn', 'debug', 'verbose'],
+  });
+
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',
   });
   // ✅ Helmet avec contentSecurityPolicy correct
   app.use(
@@ -49,10 +55,8 @@ async function bootstrap() {
     allowedHeaders: ['Authorization', 'Content-Type'],
     credentials: true,
   });
-
   // ✅ Filtres et guards globaux
   app.useGlobalFilters(new HttpExceptionFilter());
-
   // const reflector = app.get(Reflector);
   // app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
   console.log('=== DATABASE DEBUG ===');
@@ -74,6 +78,9 @@ async function bootstrap() {
       'access-token',
     )
     .build();
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/', // rend accessible via http://localhost:3000/uploads/...
+  });
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);

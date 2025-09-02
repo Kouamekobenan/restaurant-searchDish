@@ -10,7 +10,6 @@ import { RestaurantDishMapper } from '../domain/mappers/restaurantDish.mapper';
 import { CreateRestaurantDishDto } from '../application/dtos/create-restaurantDishDto';
 import { RestaurantDish } from '../domain/entities/restaurantDish.entity';
 import { UpdateRestaurantDishDto } from '../application/dtos/update-restaurantDish';
-import { connect } from 'http2';
 import { RestaurantDishWithNamesDto } from '../application/dtos/search-restau.dto';
 
 @Injectable()
@@ -92,6 +91,10 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
           skip: skip,
           take: limit,
           orderBy: { createdAt: 'desc' },
+          include: {
+            dish: true,
+            restaurant: true,
+          },
         }),
         this.prisma.restaurantDish.count(),
       ]);
@@ -115,7 +118,13 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
   }
   async getAll(): Promise<RestaurantDish[]> {
     try {
-      const restaurantDish = await this.prisma.restaurantDish.findMany();
+      const restaurantDish = await this.prisma.restaurantDish.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          restaurant: true,
+          dish: true,
+        },
+      });
       const restaurantDishMap = restaurantDish.map((restau) =>
         this.mapper.toEntity(restau),
       );
@@ -149,7 +158,6 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
     totalPage: number;
     page: number;
     limit: number;
-   
   }> {
     try {
       const skip = (page - 1) * limit;
