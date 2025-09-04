@@ -90,7 +90,7 @@ export class DishController {
   })
   async create(
     @Body() createDto: DishDto,
-    @UploadedFile() image: Express.Multer.File, 
+    @UploadedFile() image: Express.Multer.File,
   ): Promise<Dish> {
     const imagePath: string | undefined = image
       ? `/uploads/dish/${image.filename}`

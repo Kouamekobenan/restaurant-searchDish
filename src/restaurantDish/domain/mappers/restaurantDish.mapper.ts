@@ -15,8 +15,8 @@ export class RestaurantDishMapper {
       prismaModel.isAvailable,
       prismaModel.createdAt,
       prismaModel.updatedAt,
-      prismaModel.dish,
       prismaModel.restaurant,
+      prismaModel.dish,
     );
   }
   toPersistence(

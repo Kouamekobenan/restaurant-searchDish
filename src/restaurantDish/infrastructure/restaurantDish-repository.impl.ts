@@ -92,8 +92,8 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
           take: limit,
           orderBy: { createdAt: 'desc' },
           include: {
-            dish: true,
             restaurant: true,
+            dish: true,
           },
         }),
         this.prisma.restaurantDish.count(),
