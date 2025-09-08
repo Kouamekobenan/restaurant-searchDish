@@ -34,6 +34,7 @@ model Restaurant {
   name        String
   description String?
   address     String
+  country     String? 
   latitude    Float?
   longitude   Float?
   phone       String?
@@ -71,6 +72,14 @@ model Dish {
   @@map("dishes")
 }
 
+model OtpCode {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
 
 model RestaurantDish {
   id           String @id @default(cuid())

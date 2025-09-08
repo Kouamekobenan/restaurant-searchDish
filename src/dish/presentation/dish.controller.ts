@@ -33,18 +33,9 @@ import { UpdateDishDto } from '../application/dtos/update-dish.dto';
 import { DeleteDishUseCase } from '../application/usecases/delete-dish.usecase';
 import { GetDishByIdUseCase } from '../application/usecases/get-dish-byId.usecase';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { extname, join } from 'path';
-import { diskStorage } from 'multer';
 
 // ✅ Multer config avec validation
 const multerOptions = {
-  storage: diskStorage({
-    destination: join(__dirname, '../../../uploads/dish'),
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      cb(null, uniqueSuffix + extname(file.originalname));
-    },
-  }),
   limits: {
     fileSize: 2 * 1024 * 1024, // Max 2 Mo
   },
@@ -61,7 +52,6 @@ const multerOptions = {
     cb(null, true);
   },
 };
-
 @ApiTags('Dish') // Groupe Swagger
 @Controller('Dish')
 export class DishController {
@@ -92,13 +82,8 @@ export class DishController {
     @Body() createDto: DishDto,
     @UploadedFile() image: Express.Multer.File,
   ): Promise<Dish> {
-    const imagePath: string | undefined = image
-      ? `/uploads/dish/${image.filename}`
-      : undefined;
-
-    return await this.createDishUseCase.execute(createDto, imagePath);
+    return await this.createDishUseCase.execute(createDto, image);
   }
-
   @Get('paginate')
   @ApiOperation({ summary: 'Paginer les plats' })
   @ApiQuery({
@@ -183,8 +168,7 @@ export class DishController {
     @Body() updateDto: UpdateDishDto,
     @UploadedFile() image?: Express.Multer.File,
   ): Promise<Dish> {
-    const imagePath = image ? `/uploads/dish/${image.filename}` : undefined;
-    return await this.updateDishUseCase.execute(id, updateDto, imagePath);
+    return await this.updateDishUseCase.execute(id, updateDto, image);
   }
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer un plat par ID' })

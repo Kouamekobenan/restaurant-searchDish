@@ -11,6 +11,7 @@ import { CreateRestaurantDishDto } from '../application/dtos/create-restaurantDi
 import { RestaurantDish } from '../domain/entities/restaurantDish.entity';
 import { UpdateRestaurantDishDto } from '../application/dtos/update-restaurantDish';
 import { RestaurantDishWithNamesDto } from '../application/dtos/search-restau.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class RestaurantDishRepository implements IRestaurantDishRepository {
@@ -77,6 +78,7 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
   async pagination(
     page: number,
     limit: number,
+    countryName: string,
   ): Promise<{
     data: RestaurantDish[];
     total: number;
@@ -85,9 +87,19 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
     limit: number;
   }> {
     try {
+      const where: Prisma.RestaurantDishWhereInput = {};
+      if (countryName) {
+        where.restaurant = {
+          country: {
+            contains: countryName,
+            mode: 'insensitive',
+          },
+        };
+      }
       const skip = (page - 1) * limit;
       const [restaurantDishs, total] = await Promise.all([
         this.prisma.restaurantDish.findMany({
+          where,
           skip: skip,
           take: limit,
           orderBy: { createdAt: 'desc' },
@@ -96,7 +108,7 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
             dish: true,
           },
         }),
-        this.prisma.restaurantDish.count(),
+        this.prisma.restaurantDish.count({ where }),
       ]);
       const restaurantDishMap = restaurantDishs.map((restaurantdish) =>
         this.mapper.toEntity(restaurantdish),
@@ -116,9 +128,19 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
       });
     }
   }
-  async getAll(): Promise<RestaurantDish[]> {
+  async getAll(countryName: string): Promise<RestaurantDish[]> {
     try {
+      const where: Prisma.RestaurantDishWhereInput = {};
+      if (countryName) {
+        where.restaurant = {
+          country: {
+            contains: countryName,
+            mode: 'insensitive',
+          },
+        };
+      }
       const restaurantDish = await this.prisma.restaurantDish.findMany({
+        where,
         orderBy: { createdAt: 'desc' },
         include: {
           restaurant: true,
@@ -212,5 +234,17 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
         description: error.message,
       });
     }
+  }
+  async findDishbyRestaurant(restaurantId: string): Promise<RestaurantDish[]> {
+    const restaurantDish = await this.prisma.restaurantDish.findMany({
+      where: { restaurantId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        dish: true,
+        restaurant: true,
+      },
+    });
+    const allDish = restaurantDish.map((dish) => this.mapper.toEntity(dish));
+    return allDish;
   }
 }

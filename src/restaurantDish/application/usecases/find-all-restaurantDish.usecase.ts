@@ -11,9 +11,9 @@ export class FindAllRestaurantDishUseCase {
     @Inject(RestaurantDishRepositoryName)
     private readonly restaurantDishRepository: IRestaurantDishRepository,
   ) {}
-  async execute(): Promise<RestaurantDish[]> {
+  async execute(countryName:string): Promise<RestaurantDish[]> {
     try {
-      return await this.restaurantDishRepository.getAll();
+      return await this.restaurantDishRepository.getAll(countryName);
     } catch (error) {
       throw new BadRequestException('Failled to retrieve restaurant dish', {
         cause: error,

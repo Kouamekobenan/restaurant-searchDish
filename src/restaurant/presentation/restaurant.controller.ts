@@ -32,21 +32,13 @@ import { PaginationRestaurantUseCase } from '../application/usecases/pagination-
 import { PaginateDto } from '../application/dtos/paginate-restaurant.dto';
 import { GetAllRestaurantUseCase } from '../application/usecases/getAll-restaurant.usecase';
 import { DeleteRestaurantUseCase } from '../application/usecases/delete-restaurant.usecase';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FindRestaurantByIdUseCase } from '../application/usecases/find-restaurant-byId.usecase';
 import { DeactivateRestaurantUseCase } from '../application/usecases/deactivate-restaurant.usecase';
 import { ActivateRestaurantUseCase } from '../application/usecases/activate-restaurant.usecase';
 
+// ✅ Multer config avec validation
 const multerOptions = {
-  storage: diskStorage({
-    destination: join(__dirname, '../../../uploads/restaurant'),
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      cb(null, uniqueSuffix + extname(file.originalname));
-    },
-  }),
   limits: {
     fileSize: 2 * 1024 * 1024, // Max 2 Mo
   },
@@ -91,10 +83,7 @@ export class RestaurantController {
     @Body() createDto: RestaurantDto,
     @UploadedFile() image: Express.Multer.File, // ← image reçue
   ): Promise<Restaurant> {
-    const imagePath: string | undefined = image
-      ? `/uploads/restaurant/${image.filename}`
-      : undefined;
-    return await this.createRestaurantUseCase.execute(createDto, imagePath);
+    return await this.createRestaurantUseCase.execute(createDto, image);
   }
 
   @Patch(':id')
@@ -119,8 +108,7 @@ export class RestaurantController {
     @Body() updateDto: UpdateRestaurantDto,
     @UploadedFile() image?: Express.Multer.File,
   ): Promise<Restaurant> {
-    const imagePath = image ? `/uploads/dish/${image.filename}` : undefined;
-    return await this.updateRestaurantUseCase.execute(id, updateDto, imagePath);
+    return await this.updateRestaurantUseCase.execute(id, updateDto, image);
   }
   @Get('paginate')
   @ApiOperation({ summary: 'Lister les restaurants avec pagination' })
@@ -159,7 +147,6 @@ export class RestaurantController {
   async getAll(): Promise<Restaurant[]> {
     return await this.getAllRestaurantUseCase.execute();
   }
-
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer un restaurant par ID' })
   @ApiParam({

@@ -33,7 +33,13 @@ export class RestaurantDto {
   @IsString()
   @IsNotEmpty()
   address: string;
-
+  @ApiProperty({
+    example: 'Abidjan',
+    description: 'Le d\'une ville donné',
+  })
+  @IsString()
+  @IsNotEmpty()
+  country: string;
   @ApiProperty({
     example: 5.3456,
     description: 'Latitude du restaurant (coordonnées GPS)',

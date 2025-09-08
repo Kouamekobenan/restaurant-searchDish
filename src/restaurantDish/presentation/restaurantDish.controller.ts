@@ -32,6 +32,7 @@ import { FindAllRestaurantDishUseCase } from '../application/usecases/find-all-r
 import { DeleteRestaurantDishUseCase } from '../application/usecases/delete-restaurantdish.usecase';
 import { FilterRestaurantUseCase } from '../application/usecases/filter-restaurant.usecase';
 import { SearchDto } from '../application/dtos/search-restaurantdish.dto';
+import { FindDishbyRestaurantByIdUseCase } from '../application/usecases/dish-restaurantById';
 
 @Controller('restaurantDish')
 @ApiTags('restaurantDish')
@@ -44,6 +45,7 @@ export class RestaurantDishController {
     private readonly findAllRestaurantDishUseCase: FindAllRestaurantDishUseCase,
     private readonly deleteRestaurantDishUseCase: DeleteRestaurantDishUseCase,
     private readonly filterRestaurantUseCase: FilterRestaurantUseCase,
+    private readonly findDishbyRestaurantByIdUseCase: FindDishbyRestaurantByIdUseCase,
   ) {}
 
   @Post()
@@ -114,7 +116,9 @@ export class RestaurantDishController {
   }
 
   @Get('paginate')
-  @ApiOperation({ summary: 'Récupérer une pagination des plats' })
+  @ApiOperation({
+    summary: "Récupérer une pagination des plats d'une ville donnée",
+  })
   @ApiQuery({
     name: 'page',
     required: false,
@@ -140,8 +144,15 @@ export class RestaurantDishController {
     description: 'Requête invalide (paramètres manquants ou incorrects)',
   })
   @UsePipes(new ValidationPipe({ transform: true }))
-  async pagination(@Query() query: PaginateDto) {
-    return await this.paginationDishUseCase.execute(query.page, query.limit);
+  async pagination(
+    @Query() query: PaginateDto,
+    @Query('countryName') countryName: string,
+  ) {
+    return await this.paginationDishUseCase.execute(
+      query.page,
+      query.limit,
+      countryName,
+    );
   }
   @Patch(':id')
   @ApiOperation({ summary: 'Mettre à jour une association restaurant-plat' })
@@ -206,15 +217,20 @@ export class RestaurantDishController {
     return await this.getRestaurantDishUseCase.execute(id);
   }
   @Get()
-  @ApiOperation({ summary: 'Liste tous les plats des restaurants' })
+  @ApiOperation({
+    summary:
+      'Liste tous les plats des restaurants d\'une ville précis exp("Abidjan")',
+  })
   @ApiResponse({
     status: 200,
     description: 'Liste des plats trouvée avec succès',
     type: RestaurantDish,
     isArray: true,
   })
-  async getAll(): Promise<RestaurantDish[]> {
-    return await this.findAllRestaurantDishUseCase.execute();
+  async getAll(
+    @Query('countryName') countryName: string,
+  ): Promise<RestaurantDish[]> {
+    return await this.findAllRestaurantDishUseCase.execute(countryName);
   }
   @Delete(':id')
   @ApiOperation({ summary: 'Supprime un plat de restaurant par son ID' })
@@ -234,5 +250,18 @@ export class RestaurantDishController {
   })
   async delete(@Param('id') id: string): Promise<void> {
     await this.deleteRestaurantDishUseCase.execute(id);
+  }
+  @Get('/restaurant/:id')
+  @ApiOperation({ summary: "Liste tous les plats d'un  restaurants donné" })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des plats trouvée avec succès',
+    type: RestaurantDish,
+    isArray: true,
+  })
+  async findDishbyRestaurant(
+    @Param('id') id: string,
+  ): Promise<RestaurantDish[]> {
+    return await this.findDishbyRestaurantByIdUseCase.execute(id);
   }
 }

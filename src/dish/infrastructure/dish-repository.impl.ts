@@ -100,17 +100,23 @@ export class DishRepository implements IDishRepository {
   }
   async getById(id: string): Promise<Dish> {
     try {
-      const dish = await this.prisma.dish.findUnique({where:{id}})
+      const dish = await this.prisma.dish.findUnique({ where: { id } });
       if (!dish) {
-        throw new BadRequestException(`Dish by ID: ${id} not found`)
+        throw new BadRequestException(`Dish by ID: ${id} not found`);
       }
       const response = this.mapper.toEntity(dish);
       return response;
     } catch (error) {
-      throw new BadRequestException('Failled to retrieve dish by ID',{
-        cause:error,
-        description:error.message
-      })
+      throw new BadRequestException('Failled to retrieve dish by ID', {
+        cause: error,
+        description: error.message,
+      });
     }
+  }
+  async findByName(name: string): Promise<Dish | null> {
+    const existingDish = await this.prisma.dish.findFirst({
+      where: { name },
+    });
+    return existingDish ? this.mapper.toEntity(existingDish) : null;
   }
 }

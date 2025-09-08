@@ -11,6 +11,8 @@ import { PaginationDishUseCase } from './application/usecases/pagination-dish.us
 import { UpdateDishUseCase } from './application/usecases/update-dish.usecase';
 import { DeleteDishUseCase } from './application/usecases/delete-dish.usecase';
 import {  GetDishByIdUseCase } from './application/usecases/get-dish-byId.usecase';
+import { FileUploaderName } from 'src/cloudinary/file-upload.interface';
+import { CloudinaryService } from 'src/cloudinary/claudinary.service';
 
 @Module({
   imports: [],
@@ -30,6 +32,10 @@ import {  GetDishByIdUseCase } from './application/usecases/get-dish-byId.usecas
     {
       provide: DishRepositoryName,
       useClass: DishRepository,
+    },
+    {
+      provide: FileUploaderName,
+      useClass: CloudinaryService,
     },
 
     //   mappers

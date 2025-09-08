@@ -78,13 +78,12 @@ async function bootstrap() {
       'access-token',
     )
     .build();
+    //Uploader les images avec multer
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/', // rend accessible via http://localhost:3000/uploads/...
   });
-
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
-
   try {
     await app.listen(port, host);
 

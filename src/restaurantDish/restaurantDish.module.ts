@@ -12,6 +12,7 @@ import { PaginationDishUseCase } from './application/usecases/restaurantDish.use
 import { FindAllRestaurantDishUseCase } from './application/usecases/find-all-restaurantDish.usecase';
 import { DeleteRestaurantDishUseCase } from './application/usecases/delete-restaurantdish.usecase';
 import { FilterRestaurantUseCase } from './application/usecases/filter-restaurant.usecase';
+import { FindDishbyRestaurantByIdUseCase } from './application/usecases/dish-restaurantById';
 
 @Module({
   imports: [],
@@ -20,7 +21,6 @@ import { FilterRestaurantUseCase } from './application/usecases/filter-restauran
   providers: [
     // serviec
     PrismaService,
-
     // use cases
     CreateRestaurantDishUseCase,
     UpdateRestaurantDisuUseCase,
@@ -29,7 +29,7 @@ import { FilterRestaurantUseCase } from './application/usecases/filter-restauran
     FindAllRestaurantDishUseCase,
     DeleteRestaurantDishUseCase,
     FilterRestaurantUseCase,
-  
+    FindDishbyRestaurantByIdUseCase,
     {
       provide: RestaurantDishRepositoryName,
       useClass: RestaurantDishRepository,

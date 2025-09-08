@@ -4,6 +4,7 @@ export class Restaurant {
     private name: string,
     private description: string | null,
     private address: string,
+    private country: string | null,
     private latitude: number | null,
     private longitude: number | null,
     private phone: string | null,
@@ -22,6 +23,9 @@ export class Restaurant {
 
   getName(): string {
     return this.name;
+  }
+  getCountry(): string | null {
+    return this.country;
   }
 
   getDescription(): string | null {
@@ -47,8 +51,6 @@ export class Restaurant {
   getWebsite(): string | null {
     return this.website;
   }
-
-
 
   getImages(): string | null {
     return this.image;
@@ -94,8 +96,6 @@ export class Restaurant {
   setWebsite(website: string | null): void {
     this.website = website;
   }
-
-  
 
   setImages(images: string): void {
     this.image = images;

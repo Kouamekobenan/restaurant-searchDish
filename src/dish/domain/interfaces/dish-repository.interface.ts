@@ -19,5 +19,6 @@ export interface IDishRepository {
   update(id: string, updateDto: UpdateDishDto): Promise<Dish>;
   delete(id: string): Promise<void>;
   getById(id: string): Promise<Dish>;
+  findByName(name: string): Promise<Dish | null>;
 }
 

@@ -13,6 +13,8 @@ import { DeleteRestaurantUseCase } from './application/usecases/delete-restauran
 import { FindRestaurantByIdUseCase } from './application/usecases/find-restaurant-byId.usecase';
 import { DeactivateRestaurantUseCase } from './application/usecases/deactivate-restaurant.usecase';
 import { ActivateRestaurantUseCase } from './application/usecases/activate-restaurant.usecase';
+import { FileUploaderName } from 'src/cloudinary/file-upload.interface';
+import { CloudinaryService } from 'src/cloudinary/claudinary.service';
 
 @Module({
   imports: [],
@@ -35,6 +37,10 @@ import { ActivateRestaurantUseCase } from './application/usecases/activate-resta
       provide: RestaurantRepositoryName,
       useClass: RestaurantRepository,
     },
+     {
+          provide: FileUploaderName,
+          useClass: CloudinaryService,
+        },
 
     //   mappers
     RestaurantMapper,
