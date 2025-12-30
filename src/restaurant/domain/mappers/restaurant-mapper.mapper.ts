@@ -19,6 +19,7 @@ export class RestaurantMapper {
       modelPrisma.isActive,
       modelPrisma.createdAt,
       modelPrisma.updatedAt,
+      modelPrisma.userId,
     );
   }
   toPersistence(createDto: RestaurantDto): Prisma.RestaurantCreateInput {
@@ -27,12 +28,12 @@ export class RestaurantMapper {
       description: createDto.description,
       address: createDto.address,
       country: createDto.country,
-      latitude: Number(createDto.latitude),
-      longitude: Number(createDto.longitude),
       phone: createDto.phone,
       website: createDto.website,
+      isActive: createDto.isActive,
       openingHours: createDto.openingHours,
       image: createDto.image,
+      user: { connect: { id: createDto.userId } },
     };
   }
   update(updateDto: UpdateRestaurantDto): Prisma.RestaurantUpdateInput {

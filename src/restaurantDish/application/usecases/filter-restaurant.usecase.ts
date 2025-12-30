@@ -18,7 +18,6 @@ export class FilterRestaurantUseCase {
   async execute(page: number, limit: number, nameData: string) {
     try {
       const filters = await this.restau.search(page, limit, nameData);
-      this.logger.log('Filter data! :', JSON.stringify(filters));
       return filters;
     } catch (error) {
       this.logger.error('Failled to filter restaurant dish', error);

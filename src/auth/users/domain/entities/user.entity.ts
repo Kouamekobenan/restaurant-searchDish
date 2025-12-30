@@ -1,3 +1,4 @@
+import { Restaurant } from 'src/restaurant/domain/entities/restaurant.entity';
 import { UserRole } from '../enums/role.enum';
 
 export class User {
@@ -6,9 +7,10 @@ export class User {
     private email: string,
     private password: string | null,
     private name: string | null,
-    private role:UserRole,
+    private role: UserRole,
     private createdAt: Date,
     private updatedAt: Date,
+    private restaurants?: Restaurant | null,
   ) {}
 
   // setter
@@ -29,5 +31,4 @@ export class User {
   getName(): string | null {
     return this.name;
   }
- 
 }

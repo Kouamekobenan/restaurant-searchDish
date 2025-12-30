@@ -79,6 +79,7 @@ export class RestaurantController {
     type: Restaurant,
   })
   @ApiBadRequestResponse({ description: 'Requête invalide' })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async create(
     @Body() createDto: RestaurantDto,
     @UploadedFile() image: Express.Multer.File, // ← image reçue

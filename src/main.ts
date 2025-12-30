@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
-import { Logger } from '@nestjs/common';
+import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
 import { RolesGuard } from './auth/guards/role.guard';
 import helmet from 'helmet';
@@ -43,6 +43,8 @@ async function bootstrap() {
     : configService.get<number>('PORT', 3000);
 
   const host = configService.get<string>('HOST', '0.0.0.0');
+  const apiPrefix = configService.get('API_PREFIX') || 'api/v1';
+  app.setGlobalPrefix(apiPrefix);
 
   // ✅ Configuration CORS pour le frontend Electron/Next.js
   app.enableCors({
@@ -57,11 +59,21 @@ async function bootstrap() {
   });
   // ✅ Filtres et guards globaux
   app.useGlobalFilters(new HttpExceptionFilter());
-  // const reflector = app.get(Reflector);
-  // app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
-  console.log('=== DATABASE DEBUG ===');
-  console.log('DATABASE_URL:', process.env.DATABASE_URL);
-  console.log('Connecting to database...');
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      disableErrorMessages: false,
+      transformOptions: {
+        enableImplicitConversion: false, // ✅ Désactive la conversion implicite (pas "Active")
+      },
+      exceptionFactory: (errors) => {
+        console.log('Validation errors:', JSON.stringify(errors, null, 2));
+        return new BadRequestException(errors);
+      },
+    }),
+  );
 
   // ✅ Swagger config
   const config = new DocumentBuilder()
@@ -78,19 +90,23 @@ async function bootstrap() {
       'access-token',
     )
     .build();
-    //Uploader les images avec multer
+  //Uploader les images avec multer
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/', // rend accessible via http://localhost:3000/uploads/...
   });
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
-  try {
-    await app.listen(port, host);
+  SwaggerModule.setup(`${apiPrefix}/docs`, app, document);
 
+  try {
     const logger = new Logger('Bootstrap');
-    logger.log(`🚀 Application running on: ${await app.getUrl()}/api/docs`);
-    logger.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
-    logger.log(`📡 Listening on ${host}:${port}`);
+    const port = configService.get('PORT') || 3000;
+    await app.listen(port);
+    logger.log(
+      `🚀 Application running on: http://localhost:${port}/${apiPrefix}`,
+    );
+    logger.log(
+      `📖 Swagger documentation: http://localhost:${port}/${apiPrefix}/docs`,
+    );
   } catch (error) {
     const logger = new Logger('Bootstrap');
     logger.error('❌ Failed to start the server', error);

@@ -35,7 +35,10 @@ export class UserRepository implements IUserRepository {
     }
   }
   async findByEmail(email: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      include: { restaurants: true },
+    });
 
     if (!user) {
       throw new NotFoundException(
@@ -78,6 +81,7 @@ export class UserRepository implements IUserRepository {
     try {
       const users = await this.prisma.user.findUnique({
         where: { id: userId },
+        include: { restaurants: true },
       });
       if (!users) {
         throw new NotFoundException(`User :${userId} doesn't exist!`);
@@ -171,5 +175,11 @@ export class UserRepository implements IUserRepository {
         description: error.message,
       });
     }
+  }
+  async updateRole(id: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id },
+      data: { role: 'RESTAURATEUR' },
+    });
   }
 }

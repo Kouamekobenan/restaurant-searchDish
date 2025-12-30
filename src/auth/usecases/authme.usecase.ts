@@ -15,14 +15,15 @@ export class AuthMeUseCase {
     @Inject('IUserRepository')
     private readonly userRepository: IUserRepository,
   ) {}
-  async execute(userId: string):Promise<User> {
+  async execute(userId: string): Promise<User> {
     console.log('User trouvé:', userId);
     try {
       const user = await this.userRepository.getUserById(userId);
-      console.log('User trouvé:', user);
-      this.logger.log('user connect:', JSON.stringify(user));
+      // console.log('User trouvé:', user);
+      // this.logger.log('user connect:', JSON.stringify(user));
       return user;
     } catch (error) {
+      this.logger.error('Failed to retrieve user', error);
       throw new BadRequestException('Failed to retrieve user', {
         cause: error,
         description: error.message,

@@ -8,6 +8,7 @@ import { FindUserByIdUseCase } from './application/usecases/find_user_by_id.use_
 import { PaginateUserUseCase } from './application/usecases/paginate-user.usecase';
 import { FilterUserUseCase } from './application/usecases/filter-user.usecase';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateRoleUserUseCase } from '../usecases/update-role-user.usecase';
 
 @Module({
   imports: [],
@@ -23,6 +24,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
     FindUserByIdUseCase,
     PaginateUserUseCase,
     FilterUserUseCase,
+    UpdateRoleUserUseCase,
     {
       provide: 'IUserRepository',
       useClass: UserRepository,
