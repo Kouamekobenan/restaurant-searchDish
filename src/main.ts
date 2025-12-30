@@ -1,11 +1,9 @@
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
 import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
-import { RolesGuard } from './auth/guards/role.guard';
 import helmet from 'helmet';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -31,7 +29,7 @@ async function bootstrap() {
             "'self'",
             'http://localhost:3000',
             'http://localhost:5173',
-            'https://restaurant-searchdish.onrender.com',
+            'https://findi-frontend-production.up.railway.app',
           ],
         },
       },
@@ -51,7 +49,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       'http://localhost:5173',
-      'https://restaurant-searchdish.onrender.com',
+      'https://findi-frontend-production.up.railway.app',
     ],
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Authorization', 'Content-Type'],
@@ -91,9 +89,7 @@ async function bootstrap() {
     )
     .build();
   //Uploader les images avec multer
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/', // rend accessible via http://localhost:3000/uploads/...
-  });
+ 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(`${apiPrefix}/docs`, app, document);
 
