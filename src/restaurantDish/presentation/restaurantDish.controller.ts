@@ -33,6 +33,8 @@ import { DeleteRestaurantDishUseCase } from '../application/usecases/delete-rest
 import { FilterRestaurantUseCase } from '../application/usecases/filter-restaurant.usecase';
 import { SearchDto } from '../application/dtos/search-restaurantdish.dto';
 import { FindDishbyRestaurantByIdUseCase } from '../application/usecases/dish-restaurantById';
+import { PaginationDishNameUseCase } from '../application/usecases/find-restaur-by-dishName';
+import { PaginateDishDto } from 'src/common/dtos/dishName.dto';
 
 @Controller('restaurantDish')
 @ApiTags('restaurantDish')
@@ -46,6 +48,7 @@ export class RestaurantDishController {
     private readonly deleteRestaurantDishUseCase: DeleteRestaurantDishUseCase,
     private readonly filterRestaurantUseCase: FilterRestaurantUseCase,
     private readonly findDishbyRestaurantByIdUseCase: FindDishbyRestaurantByIdUseCase,
+    private readonly paginationDishNameUseCase: PaginationDishNameUseCase,
   ) {}
 
   @Post()
@@ -152,6 +155,46 @@ export class RestaurantDishController {
       query.page,
       query.limit,
       query.countryName,
+    );
+  }
+
+  @Get('dish')
+  @ApiOperation({
+    summary: "Récupérer une pagination des plats d'une ville donnée",
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Numéro de page (par défaut: 1)',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: "Nombre d'éléments par page (par défaut: 10)",
+    example: 10,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste paginée des plats',
+    type: Dish,
+    isArray: true,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Requête invalide (paramètres manquants ou incorrects)',
+  })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getName(
+    @Query() query: PaginateDishDto,
+    @Query('dishName') dishName: string,
+  ) {
+    return await this.paginationDishNameUseCase.execute(
+      query.page,
+      query.limit,
+      dishName,
     );
   }
   @Patch(':id')

@@ -22,6 +22,17 @@ export interface IRestaurantDishRepository {
     page: number;
     limit: number;
   }>;
+  getDish(
+    page: number,
+    limit: number,
+    dishName:string,
+  ): Promise<{
+    data: RestaurantDish[];
+    total: number;
+    totalPage: number;
+    page: number;
+    limit: number;
+  }>;
   getAll(countryName:string): Promise<RestaurantDish[]>;
   delete(id: string): Promise<void>;
   search(

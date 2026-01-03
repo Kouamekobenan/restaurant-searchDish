@@ -1,4 +1,4 @@
-import { Injectable, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RestaurantDishController } from './presentation/restaurantDish.controller';
@@ -13,6 +13,7 @@ import { FindAllRestaurantDishUseCase } from './application/usecases/find-all-re
 import { DeleteRestaurantDishUseCase } from './application/usecases/delete-restaurantdish.usecase';
 import { FilterRestaurantUseCase } from './application/usecases/filter-restaurant.usecase';
 import { FindDishbyRestaurantByIdUseCase } from './application/usecases/dish-restaurantById';
+import { PaginationDishNameUseCase } from './application/usecases/find-restaur-by-dishName';
 
 @Module({
   imports: [],
@@ -30,6 +31,7 @@ import { FindDishbyRestaurantByIdUseCase } from './application/usecases/dish-res
     DeleteRestaurantDishUseCase,
     FilterRestaurantUseCase,
     FindDishbyRestaurantByIdUseCase,
+    PaginationDishNameUseCase,
     {
       provide: RestaurantDishRepositoryName,
       useClass: RestaurantDishRepository,

@@ -247,4 +247,57 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
     const allDish = restaurantDish.map((dish) => this.mapper.toEntity(dish));
     return allDish;
   }
+  async getDish(
+    page: number,
+    limit: number,
+    dishName: string,
+  ): Promise<{
+    data: RestaurantDish[];
+    total: number;
+    totalPage: number;
+    page: number;
+    limit: number;
+  }> {
+    try {
+      const where: Prisma.RestaurantDishWhereInput = {};
+      if (dishName) {
+        where.dish = {
+          name: {
+            contains: dishName,
+            mode: 'insensitive',
+          },
+        };
+      }
+      const skip = (page - 1) * limit;
+      const [restaurantDishs, total] = await Promise.all([
+        this.prisma.restaurantDish.findMany({
+          where,
+          skip: skip,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+          include: {
+            restaurant: true,
+            dish: true,
+          },
+        }),
+        this.prisma.restaurantDish.count({ where }),
+      ]);
+      const restaurantDishMap = restaurantDishs.map((restaurantdish) =>
+        this.mapper.toEntity(restaurantdish),
+      );
+      return {
+        data: restaurantDishMap,
+        total,
+        totalPage: Math.ceil(total / limit),
+        page,
+        limit,
+      };
+    } catch (error) {
+      this.logger.error(`Failled to pagination restaurant dish ${error.stack}`);
+      throw new BadRequestException('Failled to pagination restaurant dish ', {
+        cause: error,
+        description: error.message,
+      });
+    }
+  }
 }
