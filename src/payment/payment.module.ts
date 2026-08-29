@@ -6,6 +6,7 @@ import { JekoPaymentService } from './infrastructure/jeko-payment.service';
 import { InitiateOrderPaymentUseCase } from './application/usecases/initiate-order-payment.usecase';
 import { RefreshOrderPaymentStatusUseCase } from './application/usecases/refresh-order-payment-status.usecase';
 import { HandleJekoWebhookUseCase } from './application/usecases/handle-jeko-webhook.usecase';
+import { ListJekoStoresUseCase } from './application/usecases/list-jeko-stores.usecase';
 
 @Module({
   imports: [OrderModule],
@@ -14,6 +15,7 @@ import { HandleJekoWebhookUseCase } from './application/usecases/handle-jeko-web
     InitiateOrderPaymentUseCase,
     RefreshOrderPaymentStatusUseCase,
     HandleJekoWebhookUseCase,
+    ListJekoStoresUseCase,
     {
       provide: PaymentGatewayName,
       useClass: JekoPaymentService,

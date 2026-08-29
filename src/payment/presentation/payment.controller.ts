@@ -20,6 +20,7 @@ import { InitiatePaymentDto } from '../application/dtos/initiate-payment.dto';
 import { InitiateOrderPaymentUseCase } from '../application/usecases/initiate-order-payment.usecase';
 import { RefreshOrderPaymentStatusUseCase } from '../application/usecases/refresh-order-payment-status.usecase';
 import { HandleJekoWebhookUseCase } from '../application/usecases/handle-jeko-webhook.usecase';
+import { ListJekoStoresUseCase } from '../application/usecases/list-jeko-stores.usecase';
 import { verifyJekoSignature } from '../infrastructure/jeko-signature.util';
 
 @ApiTags('payments')
@@ -29,8 +30,19 @@ export class PaymentController {
     private readonly initiateOrderPaymentUseCase: InitiateOrderPaymentUseCase,
     private readonly refreshOrderPaymentStatusUseCase: RefreshOrderPaymentStatusUseCase,
     private readonly handleJekoWebhookUseCase: HandleJekoWebhookUseCase,
+    private readonly listJekoStoresUseCase: ListJekoStoresUseCase,
     private readonly configService: ConfigService,
   ) {}
+
+  @Get('payments/jeko/stores')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: 'Lister les magasins (stores) Jèko rattachés au compte business',
+  })
+  async listStores() {
+    return await this.listJekoStoresUseCase.execute();
+  }
 
   @Post('orders/:orderId/pay')
   @UseGuards(JwtAuthGuard, RolesGuard)

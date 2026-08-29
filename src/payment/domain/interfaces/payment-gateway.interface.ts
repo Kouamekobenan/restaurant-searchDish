@@ -14,6 +14,11 @@ export interface PaymentRequestResult {
   redirectUrl: string;
 }
 
+export interface JekoStore {
+  id: string;
+  name: string;
+}
+
 export const PaymentGatewayName = 'IPaymentGateway';
 export interface IPaymentGateway {
   createPaymentRequest(
@@ -22,4 +27,5 @@ export interface IPaymentGateway {
   getPaymentRequest(
     paymentRequestId: string,
   ): Promise<{ id: string; status: JekoPaymentRequestStatus }>;
+  listStores(): Promise<JekoStore[]>;
 }

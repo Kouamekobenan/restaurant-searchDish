@@ -5,6 +5,7 @@ import {
   CreatePaymentRequestInput,
   IPaymentGateway,
   JekoPaymentRequestStatus,
+  JekoStore,
   PaymentRequestResult,
 } from '../domain/interfaces/payment-gateway.interface';
 
@@ -79,6 +80,22 @@ export class JekoPaymentService implements IPaymentGateway {
       );
       throw new InternalServerErrorException(
         'Échec de la récupération du statut du paiement',
+        { cause: error, description: error.message },
+      );
+    }
+  }
+
+  async listStores(): Promise<JekoStore[]> {
+    try {
+      const { data } = await this.client.get('/partner_api/stores');
+      return data.map((store: any) => ({ id: store.id, name: store.name }));
+    } catch (error) {
+      this.logger.error(
+        'Failed to list Jeko stores',
+        error?.response?.data ?? error.stack,
+      );
+      throw new InternalServerErrorException(
+        'Échec de la récupération des magasins Jèko',
         { cause: error, description: error.message },
       );
     }
