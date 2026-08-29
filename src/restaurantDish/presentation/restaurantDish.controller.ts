@@ -34,6 +34,7 @@ import { FilterRestaurantUseCase } from '../application/usecases/filter-restaura
 import { SearchDto } from '../application/dtos/search-restaurantdish.dto';
 import { FindDishbyRestaurantByIdUseCase } from '../application/usecases/dish-restaurantById';
 import { FindRestaurantDishByDishNameUseCase } from '../application/usecases/find-restaurantDish-by-dishName.usecase';
+import { FindByDishNameDto } from '../application/dtos/find-by-dishName.dto';
 
 @Controller('restaurantDish')
 @ApiTags('restaurantDish')
@@ -189,14 +190,11 @@ export class RestaurantDishController {
     isArray: true,
   })
   @UsePipes(new ValidationPipe({ transform: true }))
-  async findByDishName(
-    @Query() query: PaginateDto,
-    @Query('dishName') dishName: string,
-  ) {
+  async findByDishName(@Query() query: FindByDishNameDto) {
     return await this.findRestaurantDishByDishNameUseCase.execute(
       query.page,
       query.limit,
-      dishName,
+      query.dishName,
     );
   }
   @Patch(':id')
