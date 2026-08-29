@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer'; // Ajout nécessaire
 import {
   IsString,
-  IsNotEmpty,
   IsOptional,
   IsNumber,
   IsLatitude,
@@ -11,16 +11,20 @@ import {
   IsBoolean,
   IsObject,
 } from 'class-validator';
-
 export class UpdateRestaurantDto {
-  @ApiProperty({ example: 'Le Gourmet', description: 'Nom du restaurant' })
+  @ApiProperty({
+    example: 'Le Gourmet',
+    description: 'Nom du restaurant',
+    required: false,
+  })
   @IsString()
-  @IsNotEmpty()
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @ApiProperty({
     example: 'Restaurant gastronomique français',
     description: 'Description du restaurant',
+    required: false,
   })
   @IsString()
   @IsOptional()
@@ -29,41 +33,52 @@ export class UpdateRestaurantDto {
   @ApiProperty({
     example: '12 Rue des Lilas, Abidjan',
     description: 'Adresse complète du restaurant',
+    required: false,
   })
   @IsString()
-  @IsNotEmpty()
-  address: string;
+  @IsOptional()
+  address?: string;
 
   @ApiProperty({
     example: 5.3456,
     description: 'Latitude du restaurant (coordonnées GPS)',
+    required: false,
   })
+  @Transform(({ value }) => (value ? Number(value) : value)) // FormData envoie souvent du texte, on cast en nombre
   @IsNumber()
   @IsLatitude()
-  latitude: number;
+  @IsOptional()
+  latitude?: number;
 
   @ApiProperty({
     example: -4.0123,
     description: 'Longitude du restaurant (coordonnées GPS)',
+    required: false,
   })
+  @Transform(({ value }) => (value ? Number(value) : value)) // Idem pour longitude
   @IsNumber()
   @IsLongitude()
-  longitude: number;
+  @IsOptional()
+  longitude?: number;
 
   @ApiProperty({
     example: '+2250700000000',
     description: 'Numéro de téléphone du restaurant',
+    required: false,
   })
-  @IsPhoneNumber('CI') // tu peux mettre 'FR' ou 'CI' selon le pays
-  phone: string;
+  @IsPhoneNumber('CI')
+  @IsOptional()
+  phone?: string;
 
   @ApiProperty({
     example: 'https://www.legourmet.ci',
     description: 'Site web du restaurant',
+    required: false,
   })
   @IsUrl()
   @IsOptional()
   website?: string;
+
   @ApiProperty({
     type: 'string',
     format: 'binary',
@@ -76,23 +91,33 @@ export class UpdateRestaurantDto {
   @ApiProperty({
     example: true,
     description: 'Indique si le restaurant est actif ou non',
+    required: false,
   })
+  @Transform(({ value }) => value === 'true' || value === true) // Transforme "true" (string) en true (boolean)
   @IsBoolean()
-  isActive: boolean;
+  @IsOptional()
+  isActive?: boolean;
 
   @ApiProperty({
     example: {
       monday: '08:00-20:00',
-      tuesday: '08:00-20:00',
-      wednesday: '08:00-20:00',
-      thursday: '08:00-20:00',
-      friday: '08:00-22:00',
-      saturday: '10:00-22:00',
-      sunday: 'Fermé',
     },
     description: "Horaires d'ouverture du restaurant sous forme de JSON",
     type: Object,
+    required: false,
+  })
+  // LA CORRECTION EST ICI :
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        return value;
+      }
+    }
+    return value;
   })
   @IsObject()
-  openingHours: Record<string, string>;
+  @IsOptional()
+  openingHours?: Record<string, string>;
 }

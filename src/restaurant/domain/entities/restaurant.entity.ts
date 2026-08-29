@@ -14,16 +14,15 @@ export class Restaurant {
     private isActive: boolean,
     private readonly createdAt: Date,
     private updatedAt: Date,
-    private readonly ownerId: string | null,
+    private readonly userId: string | null,
   ) {}
 
   // Getters
   getId(): string {
     return this.id;
   }
-
-  get OwnerId():string | null{
-    return this.ownerId
+  getUserId(): string | null {
+    return this.userId;
   }
 
   getName(): string {

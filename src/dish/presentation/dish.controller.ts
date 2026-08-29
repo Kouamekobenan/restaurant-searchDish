@@ -53,8 +53,8 @@ const multerOptions = {
     cb(null, true);
   },
 };
-@ApiTags('Dish') // Groupe Swagger
-@Controller('Dish')
+@ApiTags('dish') // Groupe Swagger
+@Controller('dish')
 export class DishController {
   constructor(
     private readonly createDishUseCase: CreateDishUseCase,

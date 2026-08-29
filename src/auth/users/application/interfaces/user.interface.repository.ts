@@ -30,4 +30,5 @@ export interface IUserRepository {
     page: number;
   }>;
   findByPhone(phone: string): Promise<User | null>;
+  updateRole(id: string): Promise<void>;
 }

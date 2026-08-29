@@ -13,7 +13,7 @@ export class UserMapper {
       role: data.role,
     };
   }
-  toAplication(Userdata: UserPrisma): User {
+  toAplication(Userdata: UserPrisma & { restaurants?: any }): User {
     return new User(
       Userdata.id,
       Userdata.email,
@@ -23,6 +23,7 @@ export class UserMapper {
       Userdata.role as Role,
       Userdata.createdAt,
       Userdata.updatedAt,
+      Userdata.restaurants ? Userdata.restaurants : null,
     );
   }
   toUpdateUser(userData: UserDto): any {

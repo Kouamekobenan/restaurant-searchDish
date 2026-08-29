@@ -148,14 +148,15 @@ export class RestaurantDishController {
   @UsePipes(new ValidationPipe({ transform: true }))
   async pagination(
     @Query() query: PaginateDto,
-    @Query('countryName') countryName: string,
+    // @Query('countryName') countryName: string,
   ) {
     return await this.paginationDishUseCase.execute(
       query.page,
       query.limit,
-      countryName,
+      query.countryName,
     );
   }
+
   @Get('dish')
   @ApiOperation({
     summary: "Rechercher des plats de restaurant par nom de plat (paginé)",

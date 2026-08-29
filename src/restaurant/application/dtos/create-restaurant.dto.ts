@@ -3,89 +3,64 @@ import {
   IsString,
   IsNotEmpty,
   IsOptional,
-  IsNumber,
-  IsLatitude,
-  IsLongitude,
   IsPhoneNumber,
   IsUrl,
   IsBoolean,
   IsObject,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class RestaurantDto {
-  @ApiProperty({ example: 'Le Gourmet', description: 'Nom du restaurant' })
+  @ApiProperty({ example: 'Le Gourmet' })
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({
-    example: 'Restaurant gastronomique français',
-    description: 'Description du restaurant',
-  })
+  @ApiProperty({ example: 'Restaurant gastronomique français' })
   @IsString()
   @IsOptional()
   description?: string;
 
-  @ApiProperty({
-    example: '12 Rue des Lilas, Abidjan',
-    description: 'Adresse complète du restaurant',
-  })
+  @ApiProperty({ example: '12 Rue des Lilas, Abidjan' })
   @IsString()
   @IsNotEmpty()
   address: string;
-  @ApiProperty({
-    example: 'Abidjan',
-    description: "Le d'une ville donné",
-  })
+
+  @ApiProperty({ example: 'Abidjan', description: 'Ville du restaurant' })
   @IsString()
   @IsNotEmpty()
   country: string;
-  @ApiProperty({
-    example: 5.3456,
-    description: 'Latitude du restaurant (coordonnées GPS)',
-  })
-  @IsNumber()
-  @IsLatitude()
-  latitude: number;
 
-  @ApiProperty({
-    example: -4.0123,
-    description: 'Longitude du restaurant (coordonnées GPS)',
-  })
-  @IsNumber()
-  @IsLongitude()
-  longitude: number;
-
-  @ApiProperty({
-    example: '+2250700000000',
-    description: 'Numéro de téléphone du restaurant',
-  })
+  @ApiProperty({ example: '+2250700000000' })
   @IsPhoneNumber('CI')
-  phone: string;
+  @IsOptional()
+  phone?: string;
 
-  @ApiProperty({
-    example: 'https://www.legourmet.ci',
-    description: 'Site web du restaurant',
-  })
+  @ApiProperty({ example: 'https://www.legourmet.ci' })
   @IsUrl()
   @IsOptional()
   website?: string;
 
-  @ApiProperty({
-    type: 'string',
-    format: 'binary',
-    required: false,
-    description: 'Image principale du restaurant (upload)',
-  })
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
   @IsOptional()
-  image?: any; // pour l'upload via Multer
+  image?: any;
+  @ApiProperty({ example: false, required: false, default: false })
+  @Transform(({ value }) => {
+    // Si pas défini ou vide, retourner false
+    if (value === undefined || value === null || value === '') {
+      return false;
+    }
 
-  @ApiProperty({
-    example: true,
-    description: 'Indique si le restaurant est actif ou non',
+    // Gérer les strings (multipart/form-data envoie des strings)
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    }
+    // Gérer les booleans
+    return value === true;
   })
   @IsBoolean()
-  isActive: boolean;
+  @IsOptional()
+  isActive?: boolean;
 
   @ApiProperty({
     example: {
@@ -93,18 +68,31 @@ export class RestaurantDto {
       tuesday: '08:00-20:00',
       wednesday: '08:00-20:00',
       thursday: '08:00-20:00',
-      friday: '08:00-22:00',
-      saturday: '10:00-22:00',
-      sunday: 'Fermé',
+      friday: '08:00-20:00',
+      saturday: '08:00-12:00',
+      sunday: '14:00-20:00',
     },
-    description: "Horaires d'ouverture du restaurant sous forme de JSON",
-    type: Object,
+    required: false,
   })
-  @IsObject()
-  openingHours: Record<string, string>;
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return value;
+      }
+    }
+    return value;
+  })
+  @IsOptional()
+  openingHours?: Record<string, string>;
+
   @ApiProperty({
     example: 'ckv7c9m3g0001ks8j2mg91lm5',
     description: 'ID du restaurateur',
+    required: false,
   })
-  ownerId: string;
+  @IsString()
+  @IsOptional()
+  userId?: string;
 }

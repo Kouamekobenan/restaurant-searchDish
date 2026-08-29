@@ -3,12 +3,11 @@ import {
   Delete,
   Get,
   Param,
-  Request,
   UseGuards,
-  NotFoundException,
   Query,
   UsePipes,
   ValidationPipe,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -17,6 +16,7 @@ import {
   ApiOkResponse,
   ApiBearerAuth,
   ApiQuery,
+  ApiParam,
 } from '@nestjs/swagger';
 import { User } from '../../domain/entities/user.entity';
 import { FindAllUserUseCase } from '../../application/usecases/findAlluser.user.use-case';
@@ -29,6 +29,7 @@ import { PaginateDto } from '../../application/dtos/paginate-user.dto';
 import { PaginateUserUseCase } from '../../application/usecases/paginate-user.usecase';
 import { FilterUserUseCase } from '../../application/usecases/filter-user.usecase';
 import { FilterUserDto } from '../../application/dtos/filter-user.dto';
+import { UpdateRoleUserUseCase } from 'src/auth/usecases/update-role-user.usecase';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
@@ -42,6 +43,7 @@ export class UserController {
     private readonly findUserByIdUseCase: FindUserByIdUseCase,
     private readonly paginateUserUseCase: PaginateUserUseCase,
     private readonly filterUserUseCase: FilterUserUseCase,
+    private readonly updateRoleUserUseCase: UpdateRoleUserUseCase,
   ) {}
 
   @Public()
@@ -154,7 +156,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get(':id')
   @ApiOperation({
-    summary: "Récupérer le user par son ID",
+    summary: 'Récupérer le user par son ID',
   })
   @ApiResponse({
     status: 200,
@@ -169,5 +171,18 @@ export class UserController {
     console.log('User ID:', userId);
     const user = await this.findUserByIdUseCase.execute(userId);
     return user;
+  }
+  @Patch(':id')
+  @ApiOperation({
+    summary: "Modifier le rôle d'un user par son ID",
+  })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Identifiant du user ',
+    example: 'a1b2c3d4...',
+  })
+  async updateRole(@Param('id') id: string) {
+    return this.updateRoleUserUseCase.execute(id);
   }
 }
