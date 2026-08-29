@@ -44,6 +44,7 @@ export class InitiateOrderPaymentUseCase {
       currency: order.getCurrency(),
       reference: order.getReference(),
       paymentMethod: dto.paymentMethod,
+      orderId: order.getId(),
     });
 
     await this.orderRepository.updatePaymentRequest(

@@ -6,6 +6,7 @@ export interface CreatePaymentRequestInput {
   currency: string;
   reference: string;
   paymentMethod: JekoPaymentMethod;
+  orderId: string;
 }
 
 export interface PaymentRequestResult {

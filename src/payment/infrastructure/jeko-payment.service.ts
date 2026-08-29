@@ -38,6 +38,9 @@ export class JekoPaymentService implements IPaymentGateway {
     input: CreatePaymentRequestInput,
   ): Promise<PaymentRequestResult> {
     try {
+      const successUrl = this.appendOrderId(this.successUrl, input.orderId);
+      const errorUrl = this.appendOrderId(this.errorUrl, input.orderId);
+
       const { data } = await this.client.post('/partner_api/payment_requests', {
         storeId: this.storeId,
         amountCents: input.amountCents,
@@ -47,8 +50,8 @@ export class JekoPaymentService implements IPaymentGateway {
           type: 'redirect',
           data: {
             paymentMethod: input.paymentMethod,
-            successUrl: this.successUrl,
-            errorUrl: this.errorUrl,
+            successUrl,
+            errorUrl,
           },
         },
       });
@@ -63,6 +66,12 @@ export class JekoPaymentService implements IPaymentGateway {
         { cause: error, description: error.message },
       );
     }
+  }
+
+  private appendOrderId(url: string, orderId: string): string {
+    if (!url) return url;
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}orderId=${encodeURIComponent(orderId)}`;
   }
 
   async getPaymentRequest(
