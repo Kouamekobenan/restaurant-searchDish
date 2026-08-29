@@ -26,6 +26,7 @@ import {
   ApiConsumes,
 } from '@nestjs/swagger';
 import { FindallDishUseCase } from '../application/usecases/findAll-dish.usecase';
+import { FindAllLinkedDishUseCase } from '../application/usecases/findAll-linked-dish.usecase';
 import { PaginationDishUseCase } from '../application/usecases/pagination-dish.usecase';
 import { PaginateDto } from '../application/dtos/pagination-dish.dto';
 import { UpdateDishUseCase } from '../application/usecases/update-dish.usecase';
@@ -58,6 +59,7 @@ export class DishController {
   constructor(
     private readonly createDishUseCase: CreateDishUseCase,
     private readonly findallDishUseCase: FindallDishUseCase,
+    private readonly findAllLinkedDishUseCase: FindAllLinkedDishUseCase,
     private readonly paginationDishUseCase: PaginationDishUseCase,
     private readonly updateDishUseCase: UpdateDishUseCase,
     private readonly deleteDishUseCase: DeleteDishUseCase,
@@ -135,6 +137,21 @@ export class DishController {
   @ApiResponse({ status: 500, description: 'Erreur serveur' })
   async findAll(): Promise<Dish[]> {
     return await this.findallDishUseCase.execute();
+  }
+  @Get('linked')
+  @ApiOperation({
+    summary:
+      "Récupérer uniquement les plats associés à au moins un restaurant (les plats sans association sont exclus)",
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des plats liés à au moins un restaurant',
+    type: Dish,
+    isArray: true,
+  })
+  @ApiResponse({ status: 500, description: 'Erreur serveur' })
+  async findAllLinked(): Promise<Dish[]> {
+    return await this.findAllLinkedDishUseCase.execute();
   }
   @Patch(':id')
   @ApiConsumes('multipart/form-data')

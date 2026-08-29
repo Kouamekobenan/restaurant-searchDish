@@ -26,6 +26,9 @@ export class RestaurantDish {
   getPrice(): number | null {
     return this.price;
   }
+  getIsAvailable(): boolean {
+    return this.isAvailable;
+  }
   getRestaurant(): Restaurant | undefined {
     return this.restaurant;
   }

@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString, Matches } from 'class-validator';
 import { UserRole } from '../../domain/enums/role.enum';
-
 export class UserDto {
   @ApiProperty({
     example: 'user@example.com',
@@ -9,7 +8,6 @@ export class UserDto {
   })
   @IsEmail()
   email: string;
-
   @ApiProperty({
     example: 'securepassword123',
     description: "Mot de passe de l'utilisateur",
@@ -25,6 +23,16 @@ export class UserDto {
   @IsOptional()
   @IsString()
   name?: string;
+  @ApiProperty({
+    example: '+2250701234567',
+    description: 'Numéro de téléphone au format international (8-15 chiffres)',
+  })
+  @IsString()
+  @Matches(/^\+?[0-9]{8,15}$/, {
+    message:
+      'Numéro de téléphone invalide (doit contenir entre 8 et 15 chiffres, optionnellement avec +)',
+  })
+  phone: string;
 
   @ApiProperty({
     example: UserRole.RESTAURATEUR,

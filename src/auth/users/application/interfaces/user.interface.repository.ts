@@ -22,5 +22,12 @@ export interface IUserRepository {
     filter: FilterUserDto,
     limit: number,
     page: number,
-  ): Promise<{data:User[], total:number, totalPage:number, limit:number, page:number}>;
+  ): Promise<{
+    data: User[];
+    total: number;
+    totalPage: number;
+    limit: number;
+    page: number;
+  }>;
+  findByPhone(phone: string): Promise<User | null>;
 }

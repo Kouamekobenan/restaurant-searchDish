@@ -6,6 +6,7 @@ export const DishRepositoryName = 'IDishRepository';
 export interface IDishRepository {
   create(createDto: DishDto): Promise<Dish>;
   findAll(): Promise<Dish[]>;
+  findAllLinkedToRestaurant(): Promise<Dish[]>;
   pagination(
     page: number,
     limit: number,

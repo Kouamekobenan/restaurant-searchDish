@@ -35,7 +35,7 @@ export class RestaurantDto {
   address: string;
   @ApiProperty({
     example: 'Abidjan',
-    description: 'Le d\'une ville donné',
+    description: "Le d'une ville donné",
   })
   @IsString()
   @IsNotEmpty()
@@ -102,4 +102,9 @@ export class RestaurantDto {
   })
   @IsObject()
   openingHours: Record<string, string>;
+  @ApiProperty({
+    example: 'ckv7c9m3g0001ks8j2mg91lm5',
+    description: 'ID du restaurateur',
+  })
+  ownerId: string;
 }

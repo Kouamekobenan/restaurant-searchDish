@@ -36,4 +36,16 @@ export interface IRestaurantDishRepository {
     limit: number;
   }>;
   findDishbyRestaurant(restaurantId: string): Promise<RestaurantDish[]>;
+  findManyByIds(ids: string[]): Promise<RestaurantDish[]>;
+  findByDishName(
+    page: number,
+    limit: number,
+    dishName: string,
+  ): Promise<{
+    data: RestaurantDish[];
+    total: number;
+    totalPage: number;
+    page: number;
+    limit: number;
+  }>;
 }

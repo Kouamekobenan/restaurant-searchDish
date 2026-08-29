@@ -7,6 +7,7 @@ import { DishRepositoryName } from './domain/interfaces/dish-repository.interfac
 import { DishRepository } from './infrastructure/dish-repository.impl';
 import { DishMapper } from './domain/mapper/dish.mapper';
 import { FindallDishUseCase } from './application/usecases/findAll-dish.usecase';
+import { FindAllLinkedDishUseCase } from './application/usecases/findAll-linked-dish.usecase';
 import { PaginationDishUseCase } from './application/usecases/pagination-dish.usecase';
 import { UpdateDishUseCase } from './application/usecases/update-dish.usecase';
 import { DeleteDishUseCase } from './application/usecases/delete-dish.usecase';
@@ -25,6 +26,7 @@ import { CloudinaryService } from 'src/cloudinary/claudinary.service';
     // use cases
     CreateDishUseCase,
     FindallDishUseCase,
+    FindAllLinkedDishUseCase,
     PaginationDishUseCase,
     UpdateDishUseCase,
     DeleteDishUseCase,

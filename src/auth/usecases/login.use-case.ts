@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { IUserRepository } from '../users/application/interfaces/user.interface.repository';
 import { User } from '../users/domain/entities/user.entity';
 import { AuthService } from '../services/auth.service';
@@ -11,13 +11,14 @@ export class LoginUserUseCase {
     private readonly authservice: AuthService,
   ) {}
 
+
   async execute(
-    email: string,
+    phone: string,
     password: string,
   ): Promise<{ user: User; token: {} }> {
-    const isUser = await this.userRepository.findByEmail(email);
+    const isUser = await this.userRepository.findByPhone(phone);
     if (!isUser) {
-      throw new Error(`ce email:${email} est incorrect`);
+      throw new Error(`ce email:${phone} est incorrect`);
     }
 
     const isComparePassword = await this.authservice.comparePassword(
@@ -27,11 +28,13 @@ export class LoginUserUseCase {
     if (!isComparePassword) {
       throw new Error(`ce password:${password} est incorrect`);
     }
-
+    if (isUser.Phone == undefined) {
+      throw new BadRequestException(`Phone is undefined!`);
+    }
     const generateToken = await this.authservice.generateToken({
       userId: isUser.getId(),
-      email: isUser.getEmail(),
-      role:isUser.getRole()
+      phone: isUser.Phone,
+      role: isUser.getRole(),
     });
 
     return { user: isUser, token: generateToken };

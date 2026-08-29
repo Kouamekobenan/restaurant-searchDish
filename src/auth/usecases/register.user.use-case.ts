@@ -12,7 +12,7 @@ export class RegisterUserUseCase {
   async execute(user: UserDto) {
     let existingUser;
     try {
-      existingUser = await this.userRepository.findByEmail(user.email);
+      existingUser = await this.userRepository.findByPhone(user.phone);
       console.log('voici email....', existingUser);
     } catch (error) {
       console.error("une erreur lors d'email: ", error.message);
@@ -32,11 +32,12 @@ export class RegisterUserUseCase {
       console.error('une erreur lors de la creation de user:', error.message);
       throw new BadGatewayException(
         "Erreur lors de la création de l'utilisateur",
-      );}
+      );
+    }
     const token = await this.authservice.generateToken({
       userId: newUser.getId(),
-      email: newUser.getEmail(),
-      role:newUser.getRole()
+      phone: newUser.Phone,
+      role: newUser.getRole(),
     });
     return {
       message: 'User create succeffuly 🎉',

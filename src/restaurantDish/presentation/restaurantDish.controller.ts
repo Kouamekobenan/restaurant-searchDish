@@ -33,6 +33,7 @@ import { DeleteRestaurantDishUseCase } from '../application/usecases/delete-rest
 import { FilterRestaurantUseCase } from '../application/usecases/filter-restaurant.usecase';
 import { SearchDto } from '../application/dtos/search-restaurantdish.dto';
 import { FindDishbyRestaurantByIdUseCase } from '../application/usecases/dish-restaurantById';
+import { FindRestaurantDishByDishNameUseCase } from '../application/usecases/find-restaurantDish-by-dishName.usecase';
 
 @Controller('restaurantDish')
 @ApiTags('restaurantDish')
@@ -46,6 +47,7 @@ export class RestaurantDishController {
     private readonly deleteRestaurantDishUseCase: DeleteRestaurantDishUseCase,
     private readonly filterRestaurantUseCase: FilterRestaurantUseCase,
     private readonly findDishbyRestaurantByIdUseCase: FindDishbyRestaurantByIdUseCase,
+    private readonly findRestaurantDishByDishNameUseCase: FindRestaurantDishByDishNameUseCase,
   ) {}
 
   @Post()
@@ -154,6 +156,48 @@ export class RestaurantDishController {
       countryName,
     );
   }
+  @Get('dish')
+  @ApiOperation({
+    summary: "Rechercher des plats de restaurant par nom de plat (paginé)",
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Numéro de la page',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Nombre d’éléments par page',
+    example: 10,
+  })
+  @ApiQuery({
+    name: 'dishName',
+    required: false,
+    type: String,
+    description: 'Nom (ou partie du nom) du plat recherché',
+    example: 'Pizza',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste paginée des plats de restaurant correspondant',
+    type: RestaurantDish,
+    isArray: true,
+  })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async findByDishName(
+    @Query() query: PaginateDto,
+    @Query('dishName') dishName: string,
+  ) {
+    return await this.findRestaurantDishByDishNameUseCase.execute(
+      query.page,
+      query.limit,
+      dishName,
+    );
+  }
   @Patch(':id')
   @ApiOperation({ summary: 'Mettre à jour une association restaurant-plat' })
   @ApiParam({
@@ -252,6 +296,12 @@ export class RestaurantDishController {
     await this.deleteRestaurantDishUseCase.execute(id);
   }
   @Get('/restaurant/:id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Identifiant du restaurant',
+    example: 'abc123',
+  })
   @ApiOperation({ summary: "Liste tous les plats d'un  restaurants donné" })
   @ApiResponse({
     status: 200,

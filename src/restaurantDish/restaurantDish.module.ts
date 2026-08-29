@@ -13,6 +13,7 @@ import { FindAllRestaurantDishUseCase } from './application/usecases/find-all-re
 import { DeleteRestaurantDishUseCase } from './application/usecases/delete-restaurantdish.usecase';
 import { FilterRestaurantUseCase } from './application/usecases/filter-restaurant.usecase';
 import { FindDishbyRestaurantByIdUseCase } from './application/usecases/dish-restaurantById';
+import { FindRestaurantDishByDishNameUseCase } from './application/usecases/find-restaurantDish-by-dishName.usecase';
 
 @Module({
   imports: [],
@@ -30,6 +31,7 @@ import { FindDishbyRestaurantByIdUseCase } from './application/usecases/dish-res
     DeleteRestaurantDishUseCase,
     FilterRestaurantUseCase,
     FindDishbyRestaurantByIdUseCase,
+    FindRestaurantDishByDishNameUseCase,
     {
       provide: RestaurantDishRepositoryName,
       useClass: RestaurantDishRepository,
@@ -38,6 +40,6 @@ import { FindDishbyRestaurantByIdUseCase } from './application/usecases/dish-res
     //   mappers
     RestaurantDishMapper,
   ],
-  exports: [],
+  exports: [RestaurantDishRepositoryName],
 })
 export class RestaurantDishModule {}

@@ -10,6 +10,8 @@ import { RestaurantDishModule } from './restaurantDish/restaurantDish.module';
 import { FavoriteModule } from './favorite/favorite.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { OtpModule } from './otp/otp.module';
+import { OrderModule } from './order/order.module';
+import { PaymentModule } from './payment/payment.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -21,6 +23,8 @@ import { OtpModule } from './otp/otp.module';
     FavoriteModule,
     CloudinaryModule,
     OtpModule,
+    OrderModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

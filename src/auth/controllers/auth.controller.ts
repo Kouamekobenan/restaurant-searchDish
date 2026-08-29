@@ -1,31 +1,26 @@
-import {  Request as request } from 'express';
+// import {  Request as request } from 'express';
 
-interface AuthenticatedRequest extends request {
-  user: { id: string; email: string; role: string };
-}
+// interface AuthenticatedRequest extends request {
+//   user: { id: string; email: string; role: string };
+// }
 
 import {
   Controller,
   Post,
   Body,
-  Request,
   Get,
   UseGuards,
   Req,
-  Query,
-  NotFoundException,
 } from '@nestjs/common';
 import { RegisterUserUseCase } from '../usecases/register.user.use-case';
 import { LoginUserUseCase } from '../usecases/login.use-case';
 import { UserDto } from '../users/application/dtos/user.dto';
 import { LoginDto } from '../users/application/dtos/login-dto.dto';
 import {
-  ApiTags,
   ApiOperation,
-  ApiResponse,
   ApiBody,
-  ApiOkResponse,
   ApiBearerAuth,
+  ApiResponse,
 } from '@nestjs/swagger';
 import { User } from '../users/domain/entities/user.entity';
 import { AuthMeUseCase } from '../usecases/authme.usecase';
@@ -74,7 +69,7 @@ export class AuthController {
   @ApiBody({ type: LoginDto }) // Permet de documenter le body attendu
   async login(@Body() loginDto: LoginDto) {
     return await this.loginUserUseCase.execute(
-      loginDto.email,
+      loginDto.phone,
       loginDto.password,
     );
   }

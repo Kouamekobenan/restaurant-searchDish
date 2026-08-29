@@ -15,13 +15,17 @@ export class AuthService {
   ): Promise<boolean> {
     return bcrypt.compare(password, hashedPassword);
   }
-  async generateToken(payload: { userId: string; email: string, role:UserRole }) {
+  async generateToken(payload: {
+    userId: string;
+    phone: string;
+    role: UserRole;
+  }) {
     return {
       access_token: this.jwtService.sign(
         {
           sub: payload.userId,
-          email: payload.email,
-          role:payload.role
+          phone: payload.phone,
+          role: payload.role,
         },
         { expiresIn: '1h' },
       ),

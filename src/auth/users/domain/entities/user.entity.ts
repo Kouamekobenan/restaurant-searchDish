@@ -6,7 +6,8 @@ export class User {
     private email: string,
     private password: string | null,
     private name: string | null,
-    private role:UserRole,
+    private phone: string | null,
+    private role: UserRole,
     private createdAt: Date,
     private updatedAt: Date,
   ) {}
@@ -14,6 +15,9 @@ export class User {
   // setter
   getId(): string {
     return this.id;
+  }
+  get Phone(): string | null {
+    return this.phone;
   }
 
   getEmail(): string {
@@ -29,5 +33,4 @@ export class User {
   getName(): string | null {
     return this.name;
   }
- 
 }

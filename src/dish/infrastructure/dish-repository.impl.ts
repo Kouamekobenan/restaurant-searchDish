@@ -38,6 +38,20 @@ export class DishRepository implements IDishRepository {
       });
     }
   }
+  async findAllLinkedToRestaurant(): Promise<Dish[]> {
+    try {
+      const dishs = await this.prisma.dish.findMany({
+        where: { restaurants: { some: {} } },
+        orderBy: { createdAt: 'desc' },
+      });
+      return dishs.map((dish) => this.mapper.toEntity(dish));
+    } catch (error) {
+      throw new BadRequestException('Failled to retrieve linked dish', {
+        cause: error,
+        description: error.message,
+      });
+    }
+  }
   async pagination(
     page: number,
     limit: number,

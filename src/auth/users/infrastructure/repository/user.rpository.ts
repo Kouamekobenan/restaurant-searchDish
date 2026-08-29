@@ -172,4 +172,8 @@ export class UserRepository implements IUserRepository {
       });
     }
   }
+  async findByPhone(phone: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({ where: { phone } });
+    return user ? this.mapper.toAplication(user) : null;
+  }
 }

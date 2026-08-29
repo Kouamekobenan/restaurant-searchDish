@@ -247,4 +247,57 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
     const allDish = restaurantDish.map((dish) => this.mapper.toEntity(dish));
     return allDish;
   }
+
+  async findManyByIds(ids: string[]): Promise<RestaurantDish[]> {
+    const restaurantDishes = await this.prisma.restaurantDish.findMany({
+      where: { id: { in: ids } },
+    });
+    return restaurantDishes.map((dish) => this.mapper.toEntity(dish));
+  }
+
+  async findByDishName(
+    page: number,
+    limit: number,
+    dishName: string,
+  ): Promise<{
+    data: RestaurantDish[];
+    total: number;
+    totalPage: number;
+    page: number;
+    limit: number;
+  }> {
+    try {
+      const where: Prisma.RestaurantDishWhereInput = {};
+      if (dishName) {
+        where.dish = { name: { contains: dishName, mode: 'insensitive' } };
+      }
+      const skip = (page - 1) * limit;
+      const [restaurantDishes, total] = await Promise.all([
+        this.prisma.restaurantDish.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+          include: { dish: true, restaurant: true },
+        }),
+        this.prisma.restaurantDish.count({ where }),
+      ]);
+      return {
+        data: restaurantDishes.map((item) => this.mapper.toEntity(item)),
+        total,
+        totalPage: Math.ceil(total / limit),
+        page,
+        limit,
+      };
+    } catch (error) {
+      this.logger.error('Failled to search restaurant dish by dish name', error.stack);
+      throw new BadRequestException(
+        'Failled to search restaurant dish by dish name',
+        {
+          cause: error,
+          description: error.message,
+        },
+      );
+    }
+  }
 }
