@@ -20,6 +20,8 @@ export class Order {
     private readonly createdAt: Date,
     private updatedAt: Date,
     private readonly items: OrderItem[] = [],
+    private readonly restaurantName: string | null = null,
+    private readonly restaurantImage: string | null = null,
   ) {}
 
   getId(): string {
@@ -30,6 +32,12 @@ export class Order {
   }
   getRestaurantId(): string {
     return this.restaurantId;
+  }
+  getRestaurantName(): string | null {
+    return this.restaurantName;
+  }
+  getRestaurantImage(): string | null {
+    return this.restaurantImage;
   }
   getStatus(): OrderStatus {
     return this.status;

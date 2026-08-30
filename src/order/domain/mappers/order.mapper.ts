@@ -12,6 +12,8 @@ export class OrderMapper {
           item.quantity,
           item.unitPriceCents,
           item.currency,
+          item.restaurantDish?.dish?.name ?? null,
+          item.restaurantDish?.dish?.image ?? null,
         ),
     );
     return new Order(
@@ -27,6 +29,8 @@ export class OrderMapper {
       prismaModel.createdAt,
       prismaModel.updatedAt,
       items,
+      prismaModel.restaurant?.name ?? null,
+      prismaModel.restaurant?.image ?? null,
     );
   }
 }

@@ -7,7 +7,16 @@ import {
   IOrderRepository,
 } from '../domain/interfaces/order-repository.interface';
 
-const ORDER_INCLUDE = { items: true } as const;
+const ORDER_INCLUDE = {
+  restaurant: { select: { id: true, name: true, image: true } },
+  items: {
+    include: {
+      restaurantDish: {
+        include: { dish: { select: { id: true, name: true, image: true } } },
+      },
+    },
+  },
+} as const;
 
 @Injectable()
 export class OrderRepository implements IOrderRepository {

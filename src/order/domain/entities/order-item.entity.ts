@@ -6,6 +6,8 @@ export class OrderItem {
     private readonly quantity: number,
     private readonly unitPriceCents: number,
     private readonly currency: string = 'XOF',
+    private readonly dishName: string | null = null,
+    private readonly dishImage: string | null = null,
   ) {}
 
   getId(): string {
@@ -22,5 +24,11 @@ export class OrderItem {
   }
   getCurrency(): string {
     return this.currency;
+  }
+  getDishName(): string | null {
+    return this.dishName;
+  }
+  getDishImage(): string | null {
+    return this.dishImage;
   }
 }
