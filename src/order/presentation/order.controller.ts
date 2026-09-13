@@ -72,14 +72,6 @@ export class OrderController {
     );
   }
 
-  @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @ApiOperation({ summary: 'Récupérer une commande par ID' })
-  @ApiParam({ name: 'id', description: 'ID de la commande' })
-  async getById(@Req() req: any, @Param('id') id: string): Promise<Order> {
-    return await this.getOrderByIdUseCase.execute(req.user.userId, id);
-  }
-
   // ─────────────────────────────────────────────────
   // DELIVERY ENDPOINTS
   // ─────────────────────────────────────────────────
@@ -89,7 +81,7 @@ export class OrderController {
    * Le livreur liste toutes les commandes qui lui sont assignées.
    * Chaque commande contient les infos du restaurant qui a fourni les plats.
    *
-   * ⚠️ Cette route doit être déclarée AVANT ":id" pour éviter le conflit de paramètre.
+   * ⚠️ Cette route est bien déclarée AVANT ":id" pour éviter le conflit de paramètre.
    */
   @Get('my-deliveries')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -105,6 +97,14 @@ export class OrderController {
       query.page,
       query.limit,
     );
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Récupérer une commande par ID' })
+  @ApiParam({ name: 'id', description: 'ID de la commande' })
+  async getById(@Req() req: any, @Param('id') id: string): Promise<Order> {
+    return await this.getOrderByIdUseCase.execute(req.user.userId, id);
   }
 
   /**
