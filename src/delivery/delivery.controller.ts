@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Query,
   UseGuards,
@@ -11,6 +13,7 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiResponse,
   ApiTags,
@@ -24,6 +27,7 @@ import { PaginateDto } from 'src/common/dtos/pagination.dto';
 import { CreateDeliveryUserDto } from './dtos/create-delivery-user.dto';
 import { CreateDeliveryUserUseCase } from './usecases/create-delivery-user.usecase';
 import { ListDeliveryUsersUseCase } from './usecases/list-delivery-users.usecase';
+import { DeleteDeliveryUserUseCase } from './usecases/delete-delivery-user.usecase';
 
 @ApiTags('delivery')
 @Controller('delivery')
@@ -31,6 +35,7 @@ export class DeliveryController {
   constructor(
     private readonly createDeliveryUserUseCase: CreateDeliveryUserUseCase,
     private readonly listDeliveryUsersUseCase: ListDeliveryUsersUseCase,
+    private readonly deleteDeliveryUserUseCase: DeleteDeliveryUserUseCase,
   ) {}
 
   /**
@@ -109,5 +114,25 @@ export class DeliveryController {
   @UsePipes(new ValidationPipe({ transform: true }))
   async listDeliveryUsers(@Query() query: PaginateDto) {
     return await this.listDeliveryUsersUseCase.execute(query.page, query.limit);
+  }
+
+  /**
+   * DELETE /delivery/users/:id
+   * Supprimer un compte livreur.
+   * Accessible par ADMIN seulement.
+   */
+  @Delete('users/:id')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Supprimer un livreur (Admin)',
+    description: 'Supprime un utilisateur livreur (rôle DELIVERY) par son ID.',
+  })
+  @ApiParam({ name: 'id', description: 'ID du livreur à supprimer' })
+  @ApiResponse({ status: 200, description: 'Livreur supprimé avec succès' })
+  @ApiResponse({ status: 404, description: 'Livreur non trouvé' })
+  async deleteDeliveryUser(@Param('id') id: string) {
+    return await this.deleteDeliveryUserUseCase.execute(id);
   }
 }
