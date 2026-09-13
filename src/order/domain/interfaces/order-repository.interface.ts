@@ -1,4 +1,4 @@
-import { Order, OrderStatus } from '../entities/order.entity';
+import { Order, OrderStatus, DeliveryStatus } from '../entities/order.entity';
 
 export interface CreateOrderItemInput {
   restaurantDishId: string;
@@ -14,6 +14,15 @@ export interface CreateOrderInput {
   totalAmountCents: number;
   currency: string;
   items: CreateOrderItemInput[];
+  deliveryUserId?: string;
+}
+
+export interface PaginatedOrders {
+  data: Order[];
+  total: number;
+  totalPage: number;
+  page: number;
+  limit: number;
 }
 
 export const OrderRepositoryName = 'IOrderRepository';
@@ -25,20 +34,25 @@ export interface IOrderRepository {
     userId: string,
     page: number,
     limit: number,
-  ): Promise<{
-    data: Order[];
-    total: number;
-    totalPage: number;
-    page: number;
-    limit: number;
-  }>;
-  updateStatus(
-    id: string,
-    status: OrderStatus,
-  ): Promise<Order>;
+  ): Promise<PaginatedOrders>;
+  updateStatus(id: string, status: OrderStatus): Promise<Order>;
   updatePaymentRequest(
     id: string,
     paymentMethod: string,
     jekoPaymentRequestId: string,
   ): Promise<Order>;
+  /** Assigne un livreur à une commande */
+  assignDelivery(orderId: string, deliveryUserId: string): Promise<Order>;
+  /** Met à jour le statut de livraison (par le livreur) */
+  updateDeliveryStatus(
+    orderId: string,
+    status: DeliveryStatus,
+    note?: string,
+  ): Promise<Order>;
+  /** Liste les commandes assignées à un livreur (paginé) */
+  paginateByDeliveryUser(
+    deliveryUserId: string,
+    page: number,
+    limit: number,
+  ): Promise<PaginatedOrders>;
 }

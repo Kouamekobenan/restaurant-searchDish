@@ -77,6 +77,7 @@ export class CreateOrderUseCase {
         totalAmountCents,
         currency: 'XOF',
         items,
+        ...(dto.deliveryUserId ? { deliveryUserId: dto.deliveryUserId } : {}),
       });
     } catch (error) {
       this.logger.error('Failed to create order', error.stack);

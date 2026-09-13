@@ -19,6 +19,7 @@ model User {
   restaurants Restaurant[]
   searches    SearchHistory[]
   orders      Order[]
+  deliveries  Order[]         @relation("DeliveryOrders")
 
   @@map("users")
 }
@@ -118,29 +119,42 @@ enum Role {
   DELIVERY
 }
 
+enum DeliveryStatus {
+  ASSIGNED
+  IN_DELIVERY
+  DELIVERED
+}
+
 enum OrderStatus {
   PENDING_PAYMENT
   PAID
   PAYMENT_FAILED
   CANCELLED
+  CONFIRMED
+  IN_DELIVERY
+  DELIVERED
 }
 
 model Order {
-  id                   String      @id @default(cuid())
+  id                   String          @id @default(cuid())
   userId               String
   restaurantId         String
-  status               OrderStatus @default(PENDING_PAYMENT)
+  status               OrderStatus     @default(PENDING_PAYMENT)
   totalAmountCents     Int
-  currency             String      @default("XOF")
-  reference            String      @unique
+  currency             String          @default("XOF")
+  reference            String          @unique
   paymentMethod        String?
   jekoPaymentRequestId String?
-  createdAt            DateTime    @default(now())
-  updatedAt            DateTime    @updatedAt
+  deliveryUserId       String?
+  deliveryStatus       DeliveryStatus?
+  deliveryNote         String?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
 
-  user       User        @relation(fields: [userId], references: [id])
-  restaurant Restaurant  @relation(fields: [restaurantId], references: [id])
-  items      OrderItem[]
+  user         User        @relation(fields: [userId], references: [id])
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  items        OrderItem[]
+  deliveryUser User?       @relation("DeliveryOrders", fields: [deliveryUserId], references: [id])
 
   @@map("orders")
 }

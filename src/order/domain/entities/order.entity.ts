@@ -4,7 +4,12 @@ export type OrderStatus =
   | 'PENDING_PAYMENT'
   | 'PAID'
   | 'PAYMENT_FAILED'
-  | 'CANCELLED';
+  | 'CANCELLED'
+  | 'CONFIRMED'
+  | 'IN_DELIVERY'
+  | 'DELIVERED';
+
+export type DeliveryStatus = 'ASSIGNED' | 'IN_DELIVERY' | 'DELIVERED';
 
 export class Order {
   constructor(
@@ -22,6 +27,11 @@ export class Order {
     private readonly items: OrderItem[] = [],
     private readonly restaurantName: string | null = null,
     private readonly restaurantImage: string | null = null,
+    private deliveryUserId: string | null = null,
+    private deliveryStatus: DeliveryStatus | null = null,
+    private deliveryNote: string | null = null,
+    private readonly deliveryUserName: string | null = null,
+    private readonly deliveryUserPhone: string | null = null,
   ) {}
 
   getId(): string {
@@ -65,5 +75,20 @@ export class Order {
   }
   getItems(): OrderItem[] {
     return this.items;
+  }
+  getDeliveryUserId(): string | null {
+    return this.deliveryUserId;
+  }
+  getDeliveryStatus(): DeliveryStatus | null {
+    return this.deliveryStatus;
+  }
+  getDeliveryNote(): string | null {
+    return this.deliveryNote;
+  }
+  getDeliveryUserName(): string | null {
+    return this.deliveryUserName;
+  }
+  getDeliveryUserPhone(): string | null {
+    return this.deliveryUserPhone;
   }
 }

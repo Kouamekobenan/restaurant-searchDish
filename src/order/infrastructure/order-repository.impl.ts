@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { OrderMapper } from '../domain/mappers/order.mapper';
-import { Order, OrderStatus } from '../domain/entities/order.entity';
+import { Order, OrderStatus, DeliveryStatus } from '../domain/entities/order.entity';
 import {
   CreateOrderInput,
   IOrderRepository,
+  PaginatedOrders,
 } from '../domain/interfaces/order-repository.interface';
 
 const ORDER_INCLUDE = {
@@ -16,6 +17,7 @@ const ORDER_INCLUDE = {
       },
     },
   },
+  deliveryUser: { select: { id: true, name: true, phone: true } },
 } as const;
 
 @Injectable()
@@ -44,6 +46,12 @@ export class OrderRepository implements IOrderRepository {
               currency: item.currency,
             })),
           },
+          ...(input.deliveryUserId
+            ? {
+                deliveryUser: { connect: { id: input.deliveryUserId } },
+                deliveryStatus: 'ASSIGNED',
+              }
+            : {}),
         },
         include: ORDER_INCLUDE,
       });
@@ -80,13 +88,7 @@ export class OrderRepository implements IOrderRepository {
     userId: string,
     page: number,
     limit: number,
-  ): Promise<{
-    data: Order[];
-    total: number;
-    totalPage: number;
-    page: number;
-    limit: number;
-  }> {
+  ): Promise<PaginatedOrders> {
     const skip = (page - 1) * limit;
     const [orders, total] = await Promise.all([
       this.prisma.order.findMany({
@@ -143,5 +145,79 @@ export class OrderRepository implements IOrderRepository {
         description: error.message,
       });
     }
+  }
+
+  /** Assigne un livreur à une commande existante */
+  async assignDelivery(orderId: string, deliveryUserId: string): Promise<Order> {
+    try {
+      const order = await this.prisma.order.update({
+        where: { id: orderId },
+        data: {
+          deliveryUser: { connect: { id: deliveryUserId } },
+          deliveryStatus: 'ASSIGNED',
+        },
+        include: ORDER_INCLUDE,
+      });
+      return this.mapper.toEntity(order);
+    } catch (error) {
+      this.logger.error('Failed to assign delivery user', error.stack);
+      throw new BadRequestException('Failed to assign delivery user', {
+        cause: error,
+        description: error.message,
+      });
+    }
+  }
+
+  /** Met à jour le statut de livraison (appelé par le livreur) */
+  async updateDeliveryStatus(
+    orderId: string,
+    status: DeliveryStatus,
+    note?: string,
+  ): Promise<Order> {
+    try {
+      const order = await this.prisma.order.update({
+        where: { id: orderId },
+        data: {
+          deliveryStatus: status,
+          ...(note !== undefined ? { deliveryNote: note } : {}),
+          // Synchronise également le statut global de la commande
+          status: status === 'DELIVERED' ? 'DELIVERED' : 'IN_DELIVERY',
+        },
+        include: ORDER_INCLUDE,
+      });
+      return this.mapper.toEntity(order);
+    } catch (error) {
+      this.logger.error('Failed to update delivery status', error.stack);
+      throw new BadRequestException('Failed to update delivery status', {
+        cause: error,
+        description: error.message,
+      });
+    }
+  }
+
+  /** Liste les commandes assignées à un livreur (paginé) */
+  async paginateByDeliveryUser(
+    deliveryUserId: string,
+    page: number,
+    limit: number,
+  ): Promise<PaginatedOrders> {
+    const skip = (page - 1) * limit;
+    const [orders, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where: { deliveryUserId },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: ORDER_INCLUDE,
+      }),
+      this.prisma.order.count({ where: { deliveryUserId } }),
+    ]);
+    return {
+      data: orders.map((order) => this.mapper.toEntity(order)),
+      total,
+      totalPage: Math.ceil(total / limit),
+      page,
+      limit,
+    };
   }
 }

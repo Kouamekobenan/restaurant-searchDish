@@ -8,6 +8,9 @@ import { OrderMapper } from './domain/mappers/order.mapper';
 import { CreateOrderUseCase } from './application/usecases/create-order.usecase';
 import { GetOrderByIdUseCase } from './application/usecases/get-order-by-id.usecase';
 import { ListOrdersByUserUseCase } from './application/usecases/list-orders-by-user.usecase';
+import { AssignDeliveryUseCase } from './application/usecases/assign-delivery.usecase';
+import { UpdateDeliveryStatusUseCase } from './application/usecases/update-delivery-status.usecase';
+import { ListOrdersByDeliveryUseCase } from './application/usecases/list-orders-by-delivery.usecase';
 
 @Module({
   imports: [RestaurantDishModule],
@@ -17,6 +20,9 @@ import { ListOrdersByUserUseCase } from './application/usecases/list-orders-by-u
     CreateOrderUseCase,
     GetOrderByIdUseCase,
     ListOrdersByUserUseCase,
+    AssignDeliveryUseCase,
+    UpdateDeliveryStatusUseCase,
+    ListOrdersByDeliveryUseCase,
     {
       provide: OrderRepositoryName,
       useClass: OrderRepository,

@@ -1,4 +1,4 @@
-import { Order, OrderStatus } from '../entities/order.entity';
+import { Order, OrderStatus, DeliveryStatus } from '../entities/order.entity';
 import { OrderItem } from '../entities/order-item.entity';
 
 export class OrderMapper {
@@ -31,6 +31,11 @@ export class OrderMapper {
       items,
       prismaModel.restaurant?.name ?? null,
       prismaModel.restaurant?.image ?? null,
+      prismaModel.deliveryUserId ?? null,
+      (prismaModel.deliveryStatus as DeliveryStatus) ?? null,
+      prismaModel.deliveryNote ?? null,
+      prismaModel.deliveryUser?.name ?? null,
+      prismaModel.deliveryUser?.phone ?? null,
     );
   }
 }

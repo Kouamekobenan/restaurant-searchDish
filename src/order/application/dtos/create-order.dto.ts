@@ -1,9 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
   IsNotEmpty,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -17,6 +18,14 @@ export class CreateOrderDto {
   @IsString()
   @IsNotEmpty()
   restaurantId: string;
+
+  @ApiPropertyOptional({
+    example: 'ckv7c9l8n0000ks8j2mjf3n9c',
+    description: 'ID du livreur (optionnel) — utilisateur avec rôle DELIVERY',
+  })
+  @IsString()
+  @IsOptional()
+  deliveryUserId?: string;
 
   @ApiProperty({
     type: [OrderItemDto],

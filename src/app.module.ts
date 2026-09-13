@@ -12,6 +12,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { OtpModule } from './otp/otp.module';
 import { OrderModule } from './order/order.module';
 import { PaymentModule } from './payment/payment.module';
+import { DeliveryModule } from './delivery/delivery.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -25,6 +26,7 @@ import { PaymentModule } from './payment/payment.module';
     OtpModule,
     OrderModule,
     PaymentModule,
+    DeliveryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
