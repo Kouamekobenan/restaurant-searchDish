@@ -223,7 +223,7 @@ export class OrderRepository implements IOrderRepository {
   /** Liste les commandes d'un restaurant (paginé avec filtre ONGOING/COMPLETED) */
   async paginateByRestaurant(
     restaurantId: string,
-    statusType?: 'ONGOING' | 'COMPLETED',
+    statusType?: string,
     page: number = 1,
     limit: number = 10,
   ): Promise<PaginatedOrders> {
@@ -235,6 +235,8 @@ export class OrderRepository implements IOrderRepository {
       };
     } else if (statusType === 'COMPLETED') {
       whereClause.status = { in: ['DELIVERED', 'CANCELLED'] };
+    } else if (statusType) {
+      whereClause.status = statusType;
     }
     const [orders, total] = await Promise.all([
       this.prisma.order.findMany({

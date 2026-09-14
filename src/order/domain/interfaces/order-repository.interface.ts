@@ -71,7 +71,7 @@ export interface IOrderRepository {
   /** Liste les commandes d'un restaurant (paginé avec filtre ONGOING/COMPLETED) */
   paginateByRestaurant(
     restaurantId: string,
-    statusType?: 'ONGOING' | 'COMPLETED',
+    statusType?: string,
     page?: number,
     limit?: number,
   ): Promise<PaginatedOrders>;

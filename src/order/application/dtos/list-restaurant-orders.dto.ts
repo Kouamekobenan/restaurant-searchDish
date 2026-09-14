@@ -1,15 +1,14 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, Min } from 'class-validator';
 
 export class ListRestaurantOrdersDto {
   @ApiPropertyOptional({
-    enum: ['ONGOING', 'COMPLETED'],
-    description: 'Type de statut des commandes (ONGOING pour les commandes actives, COMPLETED pour les commandes terminées)',
+    description: 'Filtre de statut (ex: ONGOING, COMPLETED, PENDING_PAYMENT, PAID, CONFIRMED, PREPARING, READY_FOR_DELIVERY, IN_DELIVERY, DELIVERED, CANCELLED)',
   })
   @IsOptional()
-  @IsEnum(['ONGOING', 'COMPLETED'])
-  statusType?: 'ONGOING' | 'COMPLETED';
+  @IsString()
+  statusType?: string;
 
   @ApiPropertyOptional({
     default: 1,

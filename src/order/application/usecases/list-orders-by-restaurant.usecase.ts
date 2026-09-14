@@ -14,7 +14,7 @@ export class ListOrdersByRestaurantUseCase {
 
   async execute(
     restaurantId: string,
-    statusType?: 'ONGOING' | 'COMPLETED',
+    statusType?: string,
     page: number = 1,
     limit: number = 10,
   ): Promise<PaginatedOrders> {
