@@ -28,9 +28,12 @@ export class PaginateDto {
   @IsInt()
   @Min(1)
   limit: number = 10;
-  // Tu dois ajouter la propriété que tu envoies depuis le front
   @IsOptional()
   @IsString()
   countryName: string;
+
+  @IsOptional()
+  @IsString()
+  statusType?: string;
   // Si tu veux utiliser cityName à la place, change countryName par cityName ici
 }

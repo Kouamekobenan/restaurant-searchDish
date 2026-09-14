@@ -35,6 +35,7 @@ import { GetRestaurantStatsUseCase } from '../application/usecases/get-restauran
 import { ListOrdersByRestaurantUseCase } from '../application/usecases/list-orders-by-restaurant.usecase';
 import { UpdateOrderStatusUseCase } from '../application/usecases/update-order-status.usecase';
 import { UpdateOrderStatusDto } from '../application/dtos/update-order-status.dto';
+import { ListRestaurantOrdersDto } from '../application/dtos/list-restaurant-orders.dto';
 import { Order } from '../domain/entities/order.entity';
 
 @ApiBearerAuth('access-token')
@@ -134,14 +135,13 @@ export class OrderController {
   @ApiParam({ name: 'restaurantId', description: 'ID du restaurant' })
   async listRestaurantOrders(
     @Param('restaurantId') restaurantId: string,
-    @Query('statusType') statusType?: 'ONGOING' | 'COMPLETED',
-    @Query() query?: PaginateDto,
+    @Query() query: ListRestaurantOrdersDto,
   ) {
     return await this.listOrdersByRestaurantUseCase.execute(
       restaurantId,
-      statusType,
-      query?.page ?? 1,
-      query?.limit ?? 10,
+      query.statusType,
+      query.page ?? 1,
+      query.limit ?? 10,
     );
   }
 
