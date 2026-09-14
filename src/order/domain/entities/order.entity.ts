@@ -6,6 +6,8 @@ export type OrderStatus =
   | 'PAYMENT_FAILED'
   | 'CANCELLED'
   | 'CONFIRMED'
+  | 'PREPARING'
+  | 'READY_FOR_DELIVERY'
   | 'IN_DELIVERY'
   | 'DELIVERED';
 
@@ -32,6 +34,8 @@ export class Order {
     private deliveryNote: string | null = null,
     private readonly deliveryUserName: string | null = null,
     private readonly deliveryUserPhone: string | null = null,
+    private readonly userName: string | null = null,
+    private readonly userPhone: string | null = null,
   ) {}
 
   getId(): string {
@@ -90,5 +94,11 @@ export class Order {
   }
   getDeliveryUserPhone(): string | null {
     return this.deliveryUserPhone;
+  }
+  getUserName(): string | null {
+    return this.userName;
+  }
+  getUserPhone(): string | null {
+    return this.userPhone;
   }
 }

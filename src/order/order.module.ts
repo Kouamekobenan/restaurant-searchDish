@@ -11,6 +11,9 @@ import { ListOrdersByUserUseCase } from './application/usecases/list-orders-by-u
 import { AssignDeliveryUseCase } from './application/usecases/assign-delivery.usecase';
 import { UpdateDeliveryStatusUseCase } from './application/usecases/update-delivery-status.usecase';
 import { ListOrdersByDeliveryUseCase } from './application/usecases/list-orders-by-delivery.usecase';
+import { GetRestaurantStatsUseCase } from './application/usecases/get-restaurant-stats.usecase';
+import { ListOrdersByRestaurantUseCase } from './application/usecases/list-orders-by-restaurant.usecase';
+import { UpdateOrderStatusUseCase } from './application/usecases/update-order-status.usecase';
 
 @Module({
   imports: [RestaurantDishModule],
@@ -23,6 +26,9 @@ import { ListOrdersByDeliveryUseCase } from './application/usecases/list-orders-
     AssignDeliveryUseCase,
     UpdateDeliveryStatusUseCase,
     ListOrdersByDeliveryUseCase,
+    GetRestaurantStatsUseCase,
+    ListOrdersByRestaurantUseCase,
+    UpdateOrderStatusUseCase,
     {
       provide: OrderRepositoryName,
       useClass: OrderRepository,

@@ -36,6 +36,8 @@ export class OrderMapper {
       prismaModel.deliveryNote ?? null,
       prismaModel.deliveryUser?.name ?? null,
       prismaModel.deliveryUser?.phone ?? null,
+      prismaModel.user?.name ?? null,
+      prismaModel.user?.phone ?? null,
     );
   }
 }

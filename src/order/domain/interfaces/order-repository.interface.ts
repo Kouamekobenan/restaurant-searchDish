@@ -25,6 +25,19 @@ export interface PaginatedOrders {
   limit: number;
 }
 
+export interface PeriodStat {
+  count: number;
+  revenueCents: number;
+}
+
+export interface RestaurantStats {
+  daily: PeriodStat;
+  weekly: PeriodStat;
+  monthly: PeriodStat;
+  ongoingCount: number;
+  deliveredCount: number;
+}
+
 export const OrderRepositoryName = 'IOrderRepository';
 export interface IOrderRepository {
   create(input: CreateOrderInput): Promise<Order>;
@@ -55,4 +68,13 @@ export interface IOrderRepository {
     page: number,
     limit: number,
   ): Promise<PaginatedOrders>;
+  /** Liste les commandes d'un restaurant (paginé avec filtre ONGOING/COMPLETED) */
+  paginateByRestaurant(
+    restaurantId: string,
+    statusType?: 'ONGOING' | 'COMPLETED',
+    page?: number,
+    limit?: number,
+  ): Promise<PaginatedOrders>;
+  /** Récupère les statistiques d'un restaurant (journalières, hebdomadaires, mensuelles) */
+  getRestaurantStats(restaurantId: string): Promise<RestaurantStats>;
 }

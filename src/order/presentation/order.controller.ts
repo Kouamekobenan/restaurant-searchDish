@@ -31,6 +31,10 @@ import { ListOrdersByUserUseCase } from '../application/usecases/list-orders-by-
 import { AssignDeliveryUseCase } from '../application/usecases/assign-delivery.usecase';
 import { UpdateDeliveryStatusUseCase } from '../application/usecases/update-delivery-status.usecase';
 import { ListOrdersByDeliveryUseCase } from '../application/usecases/list-orders-by-delivery.usecase';
+import { GetRestaurantStatsUseCase } from '../application/usecases/get-restaurant-stats.usecase';
+import { ListOrdersByRestaurantUseCase } from '../application/usecases/list-orders-by-restaurant.usecase';
+import { UpdateOrderStatusUseCase } from '../application/usecases/update-order-status.usecase';
+import { UpdateOrderStatusDto } from '../application/dtos/update-order-status.dto';
 import { Order } from '../domain/entities/order.entity';
 
 @ApiBearerAuth('access-token')
@@ -44,6 +48,9 @@ export class OrderController {
     private readonly assignDeliveryUseCase: AssignDeliveryUseCase,
     private readonly updateDeliveryStatusUseCase: UpdateDeliveryStatusUseCase,
     private readonly listOrdersByDeliveryUseCase: ListOrdersByDeliveryUseCase,
+    private readonly getRestaurantStatsUseCase: GetRestaurantStatsUseCase,
+    private readonly listOrdersByRestaurantUseCase: ListOrdersByRestaurantUseCase,
+    private readonly updateOrderStatusUseCase: UpdateOrderStatusUseCase,
   ) {}
 
   // ─────────────────────────────────────────────────
@@ -99,12 +106,67 @@ export class OrderController {
     );
   }
 
+  // ─────────────────────────────────────────────────
+  // RESTAURATEUR ENDPOINTS
+  // ─────────────────────────────────────────────────
+
+  @Get('restaurant/:restaurantId/stats')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.RESTAURATEUR, UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Restaurateur — Obtenir les statistiques du restaurant',
+    description:
+      'Retourne les statistiques (nombre de commandes et revenus journaliers, hebdomadaires, mensuels).',
+  })
+  @ApiParam({ name: 'restaurantId', description: 'ID du restaurant' })
+  async getRestaurantStats(@Param('restaurantId') restaurantId: string) {
+    return await this.getRestaurantStatsUseCase.execute(restaurantId);
+  }
+
+  @Get('restaurant/:restaurantId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.RESTAURATEUR, UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Restaurateur — Lister les commandes du restaurant (paginé)',
+    description:
+      'Permet de filtrer les commandes en cours (ONGOING) ou livrées/annulées (COMPLETED).',
+  })
+  @ApiParam({ name: 'restaurantId', description: 'ID du restaurant' })
+  async listRestaurantOrders(
+    @Param('restaurantId') restaurantId: string,
+    @Query('statusType') statusType?: 'ONGOING' | 'COMPLETED',
+    @Query() query?: PaginateDto,
+  ) {
+    return await this.listOrdersByRestaurantUseCase.execute(
+      restaurantId,
+      statusType,
+      query?.page ?? 1,
+      query?.limit ?? 10,
+    );
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Récupérer une commande par ID' })
   @ApiParam({ name: 'id', description: 'ID de la commande' })
   async getById(@Req() req: any, @Param('id') id: string): Promise<Order> {
     return await this.getOrderByIdUseCase.execute(req.user.userId, id);
+  }
+
+  @Patch(':id/status')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.RESTAURATEUR, UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Restaurateur — Mettre à jour le statut d’une commande',
+    description:
+      'Changer le statut d’une commande (ex: CONFIRMED, PREPARING, READY_FOR_DELIVERY, CANCELLED).',
+  })
+  @ApiParam({ name: 'id', description: 'ID de la commande' })
+  async updateOrderStatus(
+    @Param('id') orderId: string,
+    @Body() dto: UpdateOrderStatusDto,
+  ): Promise<Order> {
+    return await this.updateOrderStatusUseCase.execute(orderId, dto.status);
   }
 
   /**

@@ -10,6 +10,7 @@ import {
 
 const ORDER_INCLUDE = {
   restaurant: { select: { id: true, name: true, image: true } },
+  user: { select: { id: true, name: true, phone: true } },
   items: {
     include: {
       restaurantDish: {
@@ -180,7 +181,6 @@ export class OrderRepository implements IOrderRepository {
         data: {
           deliveryStatus: status,
           ...(note !== undefined ? { deliveryNote: note } : {}),
-          // Synchronise également le statut global de la commande
           status: status === 'DELIVERED' ? 'DELIVERED' : 'IN_DELIVERY',
         },
         include: ORDER_INCLUDE,
@@ -194,7 +194,6 @@ export class OrderRepository implements IOrderRepository {
       });
     }
   }
-
   /** Liste les commandes assignées à un livreur (paginé) */
   async paginateByDeliveryUser(
     deliveryUserId: string,
@@ -218,6 +217,103 @@ export class OrderRepository implements IOrderRepository {
       totalPage: Math.ceil(total / limit),
       page,
       limit,
+    };
+  }
+
+  /** Liste les commandes d'un restaurant (paginé avec filtre ONGOING/COMPLETED) */
+  async paginateByRestaurant(
+    restaurantId: string,
+    statusType?: 'ONGOING' | 'COMPLETED',
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<PaginatedOrders> {
+    const skip = (page - 1) * limit;
+    const whereClause: any = { restaurantId };
+    if (statusType === 'ONGOING') {
+      whereClause.status = {
+        in: ['PAID', 'CONFIRMED', 'PREPARING', 'READY_FOR_DELIVERY', 'IN_DELIVERY'],
+      };
+    } else if (statusType === 'COMPLETED') {
+      whereClause.status = { in: ['DELIVERED', 'CANCELLED'] };
+    }
+    const [orders, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where: whereClause,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: ORDER_INCLUDE,
+      }),
+      this.prisma.order.count({ where: whereClause }),
+    ]);
+
+    return {
+      data: orders.map((order) => this.mapper.toEntity(order)),
+      total,
+      totalPage: Math.ceil(total / limit),
+      page,
+      limit,
+    };
+  }
+
+  /** Récupère les statistiques d'un restaurant (journalières, hebdomadaires, mensuelles) */
+  async getRestaurantStats(restaurantId: string) {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - 7);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const validOrders = await this.prisma.order.findMany({
+      where: {
+        restaurantId,
+        status: { in: ['DELIVERED', 'IN_DELIVERY', 'READY_FOR_DELIVERY', 'PREPARING', 'CONFIRMED', 'PAID'] },
+      },
+      select: {
+        totalAmountCents: true,
+        createdAt: true,
+        status: true,
+      },
+    });
+
+    let dailyCount = 0;
+    let dailyRevenue = 0;
+    let weeklyCount = 0;
+    let weeklyRevenue = 0;
+    let monthlyCount = 0;
+    let monthlyRevenue = 0;
+    let ongoingCount = 0;
+    let deliveredCount = 0;
+
+    for (const order of validOrders) {
+      const orderDate = new Date(order.createdAt);
+      
+      if (orderDate >= startOfToday) {
+        dailyCount++;
+        dailyRevenue += order.totalAmountCents;
+      }
+      if (orderDate >= startOfWeek) {
+        weeklyCount++;
+        weeklyRevenue += order.totalAmountCents;
+      }
+      if (orderDate >= startOfMonth) {
+        monthlyCount++;
+        monthlyRevenue += order.totalAmountCents;
+      }
+
+      if (['CONFIRMED', 'PREPARING', 'READY_FOR_DELIVERY', 'IN_DELIVERY', 'PAID'].includes(order.status)) {
+        ongoingCount++;
+      } else if (order.status === 'DELIVERED') {
+        deliveredCount++;
+      }
+    }
+
+    return {
+      daily: { count: dailyCount, revenueCents: dailyRevenue },
+      weekly: { count: weeklyCount, revenueCents: weeklyRevenue },
+      monthly: { count: monthlyCount, revenueCents: monthlyRevenue },
+      ongoingCount,
+      deliveredCount,
     };
   }
 }
