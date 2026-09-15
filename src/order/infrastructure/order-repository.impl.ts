@@ -235,8 +235,23 @@ export class OrderRepository implements IOrderRepository {
       };
     } else if (statusType === 'COMPLETED') {
       whereClause.status = { in: ['DELIVERED', 'CANCELLED'] };
+    } else if (statusType === 'PENDING') {
+      whereClause.status = 'PENDING_PAYMENT';
     } else if (statusType) {
-      whereClause.status = statusType;
+      const validStatuses = [
+        'PENDING_PAYMENT',
+        'PAID',
+        'PAYMENT_FAILED',
+        'CANCELLED',
+        'CONFIRMED',
+        'PREPARING',
+        'READY_FOR_DELIVERY',
+        'IN_DELIVERY',
+        'DELIVERED',
+      ];
+      if (validStatuses.includes(statusType)) {
+        whereClause.status = statusType;
+      }
     }
     const [orders, total] = await Promise.all([
       this.prisma.order.findMany({

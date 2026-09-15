@@ -112,4 +112,24 @@ export class Restaurant {
   setUpdatedAt(date: Date): void {
     this.updatedAt = date;
   }
+
+  toJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      description: this.description,
+      address: this.address,
+      country: this.country,
+      latitude: this.latitude,
+      longitude: this.longitude,
+      phone: this.phone,
+      website: this.website,
+      openingHours: this.openingHours,
+      image: this.image,
+      isActive: this.isActive,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      userId: this.userId,
+    };
+  }
 }

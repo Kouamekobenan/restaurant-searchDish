@@ -236,6 +236,41 @@ export class RestaurantDishController {
   ): Promise<RestaurantDish> {
     return await this.updateRestaurantDisuUseCase.execute(id, updateDto);
   }
+  @Get('/restaurant/:id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'Identifiant du restaurant',
+    example: 'abc123',
+  })
+  @ApiOperation({ summary: "Liste tous les plats d'un  restaurants donné" })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des plats trouvée avec succès',
+    type: RestaurantDish,
+    isArray: true,
+  })
+  async findDishbyRestaurant(
+    @Param('id') id: string,
+  ): Promise<RestaurantDish[]> {
+    return await this.findDishbyRestaurantByIdUseCase.execute(id);
+  }
+  @Get()
+  @ApiOperation({
+    summary:
+      'Liste tous les plats des restaurants d\'une ville précis exp("Abidjan")',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des plats trouvée avec succès',
+    type: RestaurantDish,
+    isArray: true,
+  })
+  async getAll(
+    @Query('countryName') countryName: string,
+  ): Promise<RestaurantDish[]> {
+    return await this.findAllRestaurantDishUseCase.execute(countryName);
+  }
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une association restaurant-plat par ID' })
   @ApiParam({
@@ -259,22 +294,6 @@ export class RestaurantDishController {
   async getId(@Param('id') id: string): Promise<RestaurantDish> {
     return await this.getRestaurantDishUseCase.execute(id);
   }
-  @Get()
-  @ApiOperation({
-    summary:
-      'Liste tous les plats des restaurants d\'une ville précis exp("Abidjan")',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Liste des plats trouvée avec succès',
-    type: RestaurantDish,
-    isArray: true,
-  })
-  async getAll(
-    @Query('countryName') countryName: string,
-  ): Promise<RestaurantDish[]> {
-    return await this.findAllRestaurantDishUseCase.execute(countryName);
-  }
   @Delete(':id')
   @ApiOperation({ summary: 'Supprime un plat de restaurant par son ID' })
   @ApiParam({
@@ -293,24 +312,5 @@ export class RestaurantDishController {
   })
   async delete(@Param('id') id: string): Promise<void> {
     await this.deleteRestaurantDishUseCase.execute(id);
-  }
-  @Get('/restaurant/:id')
-  @ApiParam({
-    name: 'id',
-    type: String,
-    description: 'Identifiant du restaurant',
-    example: 'abc123',
-  })
-  @ApiOperation({ summary: "Liste tous les plats d'un  restaurants donné" })
-  @ApiResponse({
-    status: 200,
-    description: 'Liste des plats trouvée avec succès',
-    type: RestaurantDish,
-    isArray: true,
-  })
-  async findDishbyRestaurant(
-    @Param('id') id: string,
-  ): Promise<RestaurantDish[]> {
-    return await this.findDishbyRestaurantByIdUseCase.execute(id);
   }
 }

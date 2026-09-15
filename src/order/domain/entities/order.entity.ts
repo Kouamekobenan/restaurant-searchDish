@@ -101,4 +101,30 @@ export class Order {
   getUserPhone(): string | null {
     return this.userPhone;
   }
+
+  toJSON() {
+    return {
+      id: this.id,
+      userId: this.userId,
+      restaurantId: this.restaurantId,
+      status: this.status,
+      totalAmountCents: this.totalAmountCents,
+      currency: this.currency,
+      reference: this.reference,
+      paymentMethod: this.paymentMethod,
+      jekoPaymentRequestId: this.jekoPaymentRequestId,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      items: this.items.map((item) => item.toJSON()),
+      restaurantName: this.restaurantName,
+      restaurantImage: this.restaurantImage,
+      deliveryUserId: this.deliveryUserId,
+      deliveryStatus: this.deliveryStatus,
+      deliveryNote: this.deliveryNote,
+      deliveryUserName: this.deliveryUserName,
+      deliveryUserPhone: this.deliveryUserPhone,
+      userName: this.userName,
+      userPhone: this.userPhone,
+    };
+  }
 }

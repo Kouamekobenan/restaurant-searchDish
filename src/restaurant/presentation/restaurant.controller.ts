@@ -217,7 +217,7 @@ export class RestaurantController {
     status: 400,
     description: 'Requête invalide',
   })
-  async activate(@Param('id') id: string): Promise<{ message: string }> {
+  async deactivate(@Param('id') id: string): Promise<{ message: string }> {
     return await this.deactivateRestaurantUseCase.execute(id);
   }
   @Patch('activate/:id')
@@ -244,7 +244,7 @@ export class RestaurantController {
     status: 400,
     description: 'Requête invalide',
   })
-  async deactivate(@Param('id') id: string): Promise<{ message: string }> {
+  async activate(@Param('id') id: string): Promise<{ message: string }> {
     return await this.activateRestaurantUseCase.execute(id);
   }
 }

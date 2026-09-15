@@ -31,4 +31,17 @@ export class OrderItem {
   getDishImage(): string | null {
     return this.dishImage;
   }
+
+  toJSON() {
+    return {
+      id: this.id,
+      orderId: this.orderId,
+      restaurantDishId: this.restaurantDishId,
+      quantity: this.quantity,
+      unitPriceCents: this.unitPriceCents,
+      currency: this.currency,
+      dishName: this.dishName,
+      dishImage: this.dishImage,
+    };
+  }
 }

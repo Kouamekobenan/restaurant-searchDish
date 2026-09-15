@@ -30,11 +30,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     const result = super.canActivate(context);
     if (!result) {
-      try {
-        throw new UnauthorizedException('Token invalide ou expiré');
-      } catch (error) {
-        throw new error();
-      }
+      throw new UnauthorizedException('Token invalide ou expiré');
     }
     return result;
   }

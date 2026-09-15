@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
-import { HttpExceptionFilter } from './common/exceptions/http.exception.filter';
+import { AllExceptionsFilter } from './common/exceptions/all-exceptions.filter';
 import helmet from 'helmet';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -57,7 +57,7 @@ async function bootstrap() {
     credentials: true,
   });
   // ✅ Filtres et guards globaux
-  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

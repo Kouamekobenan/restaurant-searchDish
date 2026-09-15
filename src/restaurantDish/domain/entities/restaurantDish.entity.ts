@@ -36,4 +36,22 @@ export class RestaurantDish {
   getDish(): Dish | undefined {
     return this.dish;
   }
+
+  toJSON() {
+    return {
+      id: this.id,
+      restaurantId: this.restaurantId,
+      dishId: this.dishId,
+      price: this.price,
+      currency: this.currency,
+      description: this.description,
+      isAvailable: this.isAvailable,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      restaurant: this.restaurant && typeof (this.restaurant as any).toJSON === 'function'
+        ? (this.restaurant as any).toJSON()
+        : this.restaurant ?? null,
+      dish: this.dish ?? null,
+    };
+  }
 }
