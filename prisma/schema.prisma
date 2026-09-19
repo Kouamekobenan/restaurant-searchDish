@@ -39,6 +39,7 @@ model Restaurant {
   updatedAt    DateTime         @updatedAt
   image        String?
   country      String?
+  city         String?
   userId       String?
   favorites    Favorite[]
   dishes       RestaurantDish[]
@@ -46,6 +47,7 @@ model Restaurant {
   user         User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, name])
+  @@index([city])
   @@map("restaurants")
 }
 

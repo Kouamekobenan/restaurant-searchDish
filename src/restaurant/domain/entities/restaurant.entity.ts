@@ -5,6 +5,7 @@ export class Restaurant {
     private description: string | null,
     private address: string,
     private country: string | null,
+    private city: string | null,
     private latitude: number | null,
     private longitude: number | null,
     private phone: string | null,
@@ -30,6 +31,10 @@ export class Restaurant {
   }
   getCountry(): string | null {
     return this.country;
+  }
+
+  getCity(): string | null {
+    return this.city;
   }
 
   getDescription(): string | null {
@@ -77,6 +82,14 @@ export class Restaurant {
     this.name = name;
   }
 
+  setCountry(country: string | null): void {
+    this.country = country;
+  }
+
+  setCity(city: string | null): void {
+    this.city = city;
+  }
+
   setDescription(description: string | null): void {
     this.description = description;
   }
@@ -120,6 +133,7 @@ export class Restaurant {
       description: this.description,
       address: this.address,
       country: this.country,
+      city: this.city,
       latitude: this.latitude,
       longitude: this.longitude,
       phone: this.phone,

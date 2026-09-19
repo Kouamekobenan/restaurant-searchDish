@@ -40,6 +40,24 @@ export class UpdateRestaurantDto {
   address?: string;
 
   @ApiProperty({
+    example: 'Côte d\'Ivoire',
+    description: 'Pays du restaurant',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  country?: string;
+
+  @ApiProperty({
+    example: 'Abidjan',
+    description: 'Ville du restaurant',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  city?: string;
+
+  @ApiProperty({
     example: 5.3456,
     description: 'Latitude du restaurant (coordonnées GPS)',
     required: false,

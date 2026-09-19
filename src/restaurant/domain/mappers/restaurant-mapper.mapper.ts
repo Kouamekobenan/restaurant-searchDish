@@ -10,6 +10,7 @@ export class RestaurantMapper {
       modelPrisma.description,
       modelPrisma.address,
       modelPrisma.country,
+      modelPrisma.city,
       modelPrisma.latitude,
       modelPrisma.longitude,
       modelPrisma.phone,
@@ -28,12 +29,13 @@ export class RestaurantMapper {
       description: createDto.description,
       address: createDto.address,
       country: createDto.country,
+      city: createDto.city,
       phone: createDto.phone,
       website: createDto.website,
       isActive: createDto.isActive,
       openingHours: createDto.openingHours,
       image: createDto.image,
-      user: { connect: { id: createDto.userId } },
+      user: createDto.userId ? { connect: { id: createDto.userId } } : undefined,
     };
   }
   update(updateDto: UpdateRestaurantDto): Prisma.RestaurantUpdateInput {
@@ -46,6 +48,12 @@ export class RestaurantMapper {
     }
     if (updateDto.address !== undefined) {
       dataUpdate.address = updateDto.address;
+    }
+    if (updateDto.country !== undefined) {
+      dataUpdate.country = updateDto.country;
+    }
+    if (updateDto.city !== undefined) {
+      dataUpdate.city = updateDto.city;
     }
     if (updateDto.latitude !== undefined) {
       dataUpdate.latitude = Number(updateDto.latitude);

@@ -16,9 +16,9 @@ export class FindRestaurantDishByDishNameUseCase {
     @Inject(RestaurantDishRepositoryName)
     private readonly restaurantDishRepo: IRestaurantDishRepository,
   ) {}
-  async execute(page: number, limit: number, dishName: string) {
+  async execute(page: number, limit: number, dishName?: string, city?: string) {
     try {
-      return await this.restaurantDishRepo.findByDishName(page, limit, dishName);
+      return await this.restaurantDishRepo.findByDishName(page, limit, dishName, city);
     } catch (error) {
       this.logger.error('Failled to search restaurant dish by dish name', error);
       throw new BadRequestException(

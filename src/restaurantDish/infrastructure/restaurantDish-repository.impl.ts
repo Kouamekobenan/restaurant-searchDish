@@ -78,7 +78,8 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
   async pagination(
     page: number,
     limit: number,
-    countryName: string,
+    countryName?: string,
+    city?: string,
   ): Promise<{
     data: RestaurantDish[];
     total: number;
@@ -88,12 +89,13 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
   }> {
     try {
       const where: Prisma.RestaurantDishWhereInput = {};
-      if (countryName) {
+      const targetCity = city || countryName;
+      if (targetCity) {
         where.restaurant = {
-          country: {
-            contains: countryName,
-            mode: 'insensitive',
-          },
+          OR: [
+            { city: { contains: targetCity, mode: 'insensitive' } },
+            { country: { contains: targetCity, mode: 'insensitive' } },
+          ],
         };
       }
       const skip = (page - 1) * limit;
@@ -128,15 +130,16 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
       });
     }
   }
-  async getAll(countryName: string): Promise<RestaurantDish[]> {
+  async getAll(countryName?: string, city?: string): Promise<RestaurantDish[]> {
     try {
       const where: Prisma.RestaurantDishWhereInput = {};
-      if (countryName) {
+      const targetCity = city || countryName;
+      if (targetCity) {
         where.restaurant = {
-          country: {
-            contains: countryName,
-            mode: 'insensitive',
-          },
+          OR: [
+            { city: { contains: targetCity, mode: 'insensitive' } },
+            { country: { contains: targetCity, mode: 'insensitive' } },
+          ],
         };
       }
       const restaurantDish = await this.prisma.restaurantDish.findMany({
@@ -258,7 +261,8 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
   async findByDishName(
     page: number,
     limit: number,
-    dishName: string,
+    dishName?: string,
+    city?: string,
   ): Promise<{
     data: RestaurantDish[];
     total: number;
@@ -270,6 +274,14 @@ export class RestaurantDishRepository implements IRestaurantDishRepository {
       const where: Prisma.RestaurantDishWhereInput = {};
       if (dishName) {
         where.dish = { name: { contains: dishName, mode: 'insensitive' } };
+      }
+      if (city) {
+        where.restaurant = {
+          OR: [
+            { city: { contains: city, mode: 'insensitive' } },
+            { country: { contains: city, mode: 'insensitive' } },
+          ],
+        };
       }
       const skip = (page - 1) * limit;
       const [restaurantDishes, total] = await Promise.all([

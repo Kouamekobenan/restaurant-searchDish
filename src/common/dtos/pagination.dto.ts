@@ -30,10 +30,17 @@ export class PaginateDto {
   limit: number = 10;
   @IsOptional()
   @IsString()
-  countryName: string;
+  countryName?: string;
+
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  cityName?: string;
 
   @IsOptional()
   @IsString()
   statusType?: string;
-  // Si tu veux utiliser cityName à la place, change countryName par cityName ici
 }

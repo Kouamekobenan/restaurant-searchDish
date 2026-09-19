@@ -136,6 +136,13 @@ export class RestaurantDishController {
     description: "Nombre d'éléments par page (par défaut: 10)",
     example: 10,
   })
+  @ApiQuery({
+    name: 'city',
+    required: false,
+    type: String,
+    description: 'Nom de la ville pour filtrer les plats (ex: Abidjan)',
+    example: 'Abidjan',
+  })
   @ApiResponse({
     status: 200,
     description: 'Liste paginée des plats',
@@ -147,20 +154,19 @@ export class RestaurantDishController {
     description: 'Requête invalide (paramètres manquants ou incorrects)',
   })
   @UsePipes(new ValidationPipe({ transform: true }))
-  async pagination(
-    @Query() query: PaginateDto,
-    // @Query('countryName') countryName: string,
-  ) {
+  async pagination(@Query() query: PaginateDto) {
+    const city = query.city || query.cityName;
     return await this.paginationDishUseCase.execute(
       query.page,
       query.limit,
       query.countryName,
+      city,
     );
   }
 
   @Get('dish')
   @ApiOperation({
-    summary: "Rechercher des plats de restaurant par nom de plat (paginé)",
+    summary: "Rechercher des plats de restaurant par nom de plat et par ville (paginé)",
   })
   @ApiQuery({
     name: 'page',
@@ -183,6 +189,13 @@ export class RestaurantDishController {
     description: 'Nom (ou partie du nom) du plat recherché',
     example: 'Pizza',
   })
+  @ApiQuery({
+    name: 'city',
+    required: false,
+    type: String,
+    description: 'Nom de la ville pour filtrer les plats (ex: Abidjan)',
+    example: 'Abidjan',
+  })
   @ApiResponse({
     status: 200,
     description: 'Liste paginée des plats de restaurant correspondant',
@@ -195,6 +208,7 @@ export class RestaurantDishController {
       query.page,
       query.limit,
       query.dishName,
+      query.city,
     );
   }
   @Patch(':id')
@@ -258,7 +272,20 @@ export class RestaurantDishController {
   @Get()
   @ApiOperation({
     summary:
-      'Liste tous les plats des restaurants d\'une ville précis exp("Abidjan")',
+      'Liste tous les plats des restaurants d\'une ville précise ex: ("Abidjan")',
+  })
+  @ApiQuery({
+    name: 'city',
+    required: false,
+    type: String,
+    description: 'Nom de la ville (ex: Abidjan)',
+    example: 'Abidjan',
+  })
+  @ApiQuery({
+    name: 'countryName',
+    required: false,
+    type: String,
+    description: 'Nom du pays ou ville (rétrocompatibilité)',
   })
   @ApiResponse({
     status: 200,
@@ -267,9 +294,10 @@ export class RestaurantDishController {
     isArray: true,
   })
   async getAll(
-    @Query('countryName') countryName: string,
+    @Query('countryName') countryName?: string,
+    @Query('city') city?: string,
   ): Promise<RestaurantDish[]> {
-    return await this.findAllRestaurantDishUseCase.execute(countryName);
+    return await this.findAllRestaurantDishUseCase.execute(countryName, city);
   }
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une association restaurant-plat par ID' })

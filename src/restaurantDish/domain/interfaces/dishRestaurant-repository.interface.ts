@@ -14,7 +14,8 @@ export interface IRestaurantDishRepository {
   pagination(
     page: number,
     limit: number,
-    countryName:string,
+    countryName?: string,
+    city?: string,
   ): Promise<{
     data: RestaurantDish[];
     total: number;
@@ -22,12 +23,13 @@ export interface IRestaurantDishRepository {
     page: number;
     limit: number;
   }>;
-  getAll(countryName:string): Promise<RestaurantDish[]>;
+  getAll(countryName?: string, city?: string): Promise<RestaurantDish[]>;
   delete(id: string): Promise<void>;
   search(
     page: number,
     limit: number,
     dishId: string,
+    city?: string,
   ): Promise<{
     data: RestaurantDishWithNamesDto[];
     total: number;
@@ -40,7 +42,8 @@ export interface IRestaurantDishRepository {
   findByDishName(
     page: number,
     limit: number,
-    dishName: string,
+    dishName?: string,
+    city?: string,
   ): Promise<{
     data: RestaurantDish[];
     total: number;

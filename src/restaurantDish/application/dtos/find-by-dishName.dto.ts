@@ -24,5 +24,14 @@ export class FindByDishNameDto {
   })
   @IsOptional()
   @IsString()
-  dishName: string;
+  dishName?: string;
+
+  @ApiProperty({
+    required: false,
+    example: 'Abidjan',
+    description: 'Nom de la ville pour filtrer les plats',
+  })
+  @IsOptional()
+  @IsString()
+  city?: string;
 }

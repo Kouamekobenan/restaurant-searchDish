@@ -16,12 +16,13 @@ export class PaginationDishUseCase {
     @Inject(RestaurantDishRepositoryName)
     private readonly restaurantDishRepository: IRestaurantDishRepository,
   ) {}
-  async execute(page: number, limit: number, countryName: string) {
+  async execute(page: number, limit: number, countryName?: string, city?: string) {
     try {
       const restaurantDishs = await this.restaurantDishRepository.pagination(
         page,
         limit,
         countryName,
+        city,
       );
       return restaurantDishs;
     } catch (error) {

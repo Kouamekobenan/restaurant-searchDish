@@ -231,7 +231,7 @@ export class OrderRepository implements IOrderRepository {
     const whereClause: any = { restaurantId };
     if (statusType === 'ONGOING') {
       whereClause.status = {
-        in: ['PAID', 'CONFIRMED', 'PREPARING', 'READY_FOR_DELIVERY', 'IN_DELIVERY'],
+        in: ['PENDING_PAYMENT', 'PAID', 'CONFIRMED', 'PREPARING', 'READY_FOR_DELIVERY', 'IN_DELIVERY'],
       };
     } else if (statusType === 'COMPLETED') {
       whereClause.status = { in: ['DELIVERED', 'CANCELLED'] };
@@ -284,7 +284,7 @@ export class OrderRepository implements IOrderRepository {
     const validOrders = await this.prisma.order.findMany({
       where: {
         restaurantId,
-        status: { in: ['DELIVERED', 'IN_DELIVERY', 'READY_FOR_DELIVERY', 'PREPARING', 'CONFIRMED', 'PAID'] },
+        status: { in: ['DELIVERED', 'IN_DELIVERY', 'READY_FOR_DELIVERY', 'PREPARING', 'CONFIRMED', 'PAID', 'PENDING_PAYMENT'] },
       },
       select: {
         totalAmountCents: true,
@@ -318,7 +318,7 @@ export class OrderRepository implements IOrderRepository {
         monthlyRevenue += order.totalAmountCents;
       }
 
-      if (['CONFIRMED', 'PREPARING', 'READY_FOR_DELIVERY', 'IN_DELIVERY', 'PAID'].includes(order.status)) {
+      if (['PENDING_PAYMENT', 'CONFIRMED', 'PREPARING', 'READY_FOR_DELIVERY', 'IN_DELIVERY', 'PAID'].includes(order.status)) {
         ongoingCount++;
       } else if (order.status === 'DELIVERED') {
         deliveredCount++;

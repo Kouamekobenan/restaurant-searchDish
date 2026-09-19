@@ -26,10 +26,15 @@ export class RestaurantDto {
   @IsNotEmpty()
   address: string;
 
-  @ApiProperty({ example: 'Abidjan', description: 'Ville du restaurant' })
+  @ApiProperty({ example: 'Côte d\'Ivoire', description: 'Pays du restaurant', required: false })
   @IsString()
-  @IsNotEmpty()
-  country: string;
+  @IsOptional()
+  country?: string;
+
+  @ApiProperty({ example: 'Abidjan', description: 'Ville du restaurant', required: false })
+  @IsString()
+  @IsOptional()
+  city?: string;
 
   @ApiProperty({ example: '+2250700000000' })
   @IsPhoneNumber('CI')
